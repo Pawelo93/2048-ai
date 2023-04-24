@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:game_2048/board.dart';
+import 'package:game_2048/model/position.dart';
 
 const Color color2 = Color(0xFFeee4da);
 const Color color4 = Color(0xFFeee1ca);
@@ -9,18 +10,6 @@ const Color color8 = Color(0xFFf3b279);
 const Color color16 = Color(0xFFf69564);
 const Color color32 = Color(0xFFf77c5f);
 const Color color64 = Color(0xFFf75f3c);
-
-class Position {
-  final double x;
-  final double y;
-
-  Position(this.x, this.y);
-
-  @override
-  String toString() {
-    return 'Position{x: $x, y: $y}';
-  }
-}
 
 class BoardView extends StatelessWidget {
   const BoardView({Key? key, required this.board}) : super(key: key);
@@ -36,7 +25,7 @@ class BoardView extends StatelessWidget {
       }
     }
 
-    final List<Position> movingItems = board.items.map((item) => Position(item.position.x, item.position.y)).toList();
+    final List<BoardItem> movingItems = board.items;
 
     final boardWidth = MediaQuery.of(context).size.width / 2;
     final boardHeight = boardWidth;
@@ -69,31 +58,43 @@ class BoardView extends StatelessWidget {
               ),
             );
           }),
-
           ...movingItems.map((item) {
             return Positioned(
-              left: item.x * (width + gap),
-              top: item.y * (height + gap),
-              width: width,
-              height: height,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: getItemColor(2),
-                    borderRadius: BorderRadius.circular(4)),
-                child: Center(
-                  child: Text(
-                    2.toString(),
-                    style: const TextStyle(
-                      color: Color(0xFF776e65),
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
+              left: item.position.x * (width + gap),
+              top: item.position.y * (height + gap),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.easeIn,
+                transitionBuilder: (child, animation) {
+                  final tween = Tween(begin: 0.6, end: 1.0)
+                      .chain(CurveTween(curve: Curves.ease));
+                  return ScaleTransition(
+                    scale: tween.animate(animation),
+                    child: child,
+                  );
+                },
+                child: Container(
+                  key: ValueKey(item.value),
+                  width: width,
+                  height: height,
+                  decoration: BoxDecoration(
+                    color: getItemColor(item.value),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Center(
+                    child: Text(
+                      item.value.toString(),
+                      style: const TextStyle(
+                        color: Color(0xFF776e65),
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
             );
           }),
-
         ],
       ),
     );
