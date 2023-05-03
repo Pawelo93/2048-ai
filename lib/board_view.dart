@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_2048/board/board_item.dart';
 import 'package:game_2048/board/positioned_tile.dart';
 import 'package:game_2048/model/position.dart';
 
@@ -11,7 +10,10 @@ const Color color32 = Color(0xFFf77c5f);
 const Color color64 = Color(0xFFf75f3c);
 
 class BoardView extends StatelessWidget {
-  const BoardView({Key? key, required this.positionedTiles,}) : super(key: key);
+  const BoardView({
+    Key? key,
+    required this.positionedTiles,
+  }) : super(key: key);
 
   final List<PositionedTile> positionedTiles;
 
@@ -49,7 +51,7 @@ class BoardView extends StatelessWidget {
               height: height,
               child: Container(
                 decoration: BoxDecoration(
-                  color: getItemColor(0),
+                  color: const Color(0xFFccc1b4),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -58,43 +60,68 @@ class BoardView extends StatelessWidget {
           ...positionedTiles.where((tile) => tile.value > 0).map((item) {
             return AnimatedPositioned(
               key: ValueKey(item.id),
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 1000),
               left: item.position.x * (width + gap),
               top: item.position.y * (height + gap),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                switchInCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  final tween = Tween(begin: 0.6, end: 1.0)
-                      .chain(CurveTween(curve: Curves.ease));
-                  return ScaleTransition(
-                    scale: tween.animate(animation),
-                    child: child,
-                  );
-                },
-                child: Container(
-                  key: ValueKey(item.value),
-                  width: width,
-                  height: height,
-                  decoration: BoxDecoration(
-                    color: getItemColor(item.value),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Center(
-                    child: Text(
-                      item.value.toString(),
-                      style: const TextStyle(
-                        color: Color(0xFF776e65),
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+              child: TileItem(
+                tile: item,
+                width: width,
+                height: height,
               ),
             );
           }),
         ],
+      ),
+    );
+  }
+}
+
+class TileItem extends StatelessWidget {
+  const TileItem({
+    Key? key,
+    required this.tile,
+    required this.width,
+    required this.height,
+  }) : super(key: key);
+
+  final PositionedTile tile;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      // key: ValueKey(tile.id),
+      // key: ValueKey(tile.value),
+      duration: const Duration(milliseconds: 1000),
+      switchInCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) {
+        print('ANIM ${animation.value}');
+        final tween =
+            Tween(begin: 0.6, end: 1.0).chain(CurveTween(curve: Curves.ease));
+        return ScaleTransition(
+          key: ValueKey(tile.value),
+          scale: tween.animate(animation),
+          child: child,
+        );
+      },
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: getItemColor(tile.value),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: Text(
+            tile.value.toString(),
+            style: const TextStyle(
+              color: Color(0xFF776e65),
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }

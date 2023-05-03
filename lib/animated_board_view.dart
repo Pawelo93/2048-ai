@@ -10,7 +10,7 @@ class AnimatedBoardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BoardView(
-      positionedTiles: positionedTiles,
+      positionedTiles: positionedTiles //..sort((a, b) => (a.position.x + a.position.y).compareTo(b.position.x + b.position.y)),
     );
   }
 }

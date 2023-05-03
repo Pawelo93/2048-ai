@@ -15,11 +15,11 @@ class TwoDimensArray extends Equatable {
     return items[Position.int(x, y)];
   }
 
-  @override
-  List<Object?> get props => [items];
-
   List<MultiTile> getRow(int y) {
     final keys = items.keys.where((element) => element.y == y).toList();
     return items.entries.where((element) => keys.contains(element.key)).map((e) => e.value).toList();
   }
+
+  @override
+  List<Object?> get props => [items];
 }

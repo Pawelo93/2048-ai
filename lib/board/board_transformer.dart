@@ -20,10 +20,9 @@ class BoardTransformer {
     for (var y = 0; y < 4; y++) {
       final row = rows[y];
       for (var x = 0; x < 4; x++) {
-        // todo check if not null
         final tile = row.tiles[x];
         if (tile != null) {
-          newArray.put(x, y, MultiTile.single(tile));
+          newArray.put(x, y, tile);
         }
       }
     }
@@ -32,7 +31,7 @@ class BoardTransformer {
   }
 
   Row _transformRow(List<MultiTile> tiles) {
-    if(tiles.where((element) => !element.isSingle).isNotEmpty) {
+    if(tiles.where((element) => element.tiles.length > 1).isNotEmpty) {
       throw Exception('Wrong state, call merge before transformation!');
     }
     final singles = tiles.map((e) => e.firstOrNull).toList();
@@ -49,11 +48,14 @@ class BoardTransformer {
     return transformedRow;
   }
 
-  Tile? getTile(int index, List<Tile?> tiles) {
+  MultiTile? getTile(int index, List<Tile?> tiles) {
     if (tiles.length > index) {
-      return tiles[index];
-    } else {
-      return null;
+      final tile = tiles[index];
+      if (tile != null) {
+        return MultiTile.single(tile);
+      }
     }
+
+    return null;
   }
 }

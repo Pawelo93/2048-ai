@@ -5,7 +5,7 @@ class Position extends Equatable {
   final double y;
 
   int get intX => x.toInt();
-  int get intY => x.toInt();
+  int get intY => y.toInt();
 
   const Position(this.x, this.y);
 

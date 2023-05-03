@@ -1,18 +1,21 @@
+import 'dart:collection';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/board/board.dart';
+import 'package:game_2048/board/board_manager.dart';
 import 'package:game_2048/board/board_transformer_output.dart';
 import 'package:game_2048/board/multi_tile.dart';
-import 'package:game_2048/board/positioned_tile.dart';
 import 'package:game_2048/board/tile.dart';
 import 'package:game_2048/board_mover.dart';
 import 'package:game_2048/game_controller.dart';
-import 'package:game_2048/model/position.dart';
 import 'package:game_2048/two_dimens_array.dart';
+import 'package:uuid/uuid.dart';
 
 enum MovingActor {
   player,
   system,
+  waitingForAnimation,
 }
 
 enum MoveDirection {
@@ -47,21 +50,17 @@ class PlayingGameState extends GameState {
 class GameBloc extends Cubit<GameState> {
   final GameController gameController = GameController();
   final BoardMover _boardMover = BoardMover();
+  final BoardManager _boardManager = BoardManager();
 
   GameBloc() : super(InitialGameState());
 
   void startGame() {
-    // final initialBoard = Board.fromPositionalTiles([
-    //   PositionedTile('id1', Position(1, 1), 2),
-    //   PositionedTile('id2', Position(3, 1), 2),
-    //   PositionedTile('id3', Position(2, 3), 4),
-    //   PositionedTile('id4', Position(1, 0), 2),
-    // ]);
-    final TwoDimensArray twoDimensArrayMultiTile = TwoDimensArray({});
-    twoDimensArrayMultiTile.put(1, 1, const MultiTile([Tile('id1', 2)]));
-    twoDimensArrayMultiTile.put(3, 1, const MultiTile([Tile('id2', 2)]));
-    twoDimensArrayMultiTile.put(2, 3, const MultiTile([Tile('id3', 4)]));
-    twoDimensArrayMultiTile.put(1, 0, const MultiTile([Tile('id4', 2)]));
+    const uuid = Uuid();
+    final TwoDimensArray twoDimensArrayMultiTile = TwoDimensArray(HashMap());
+    twoDimensArrayMultiTile.put(1, 1, MultiTile.single(Tile('1', 2)));
+    twoDimensArrayMultiTile.put(2, 3, MultiTile.single(Tile('3', 8)));
+    twoDimensArrayMultiTile.put(3, 1, MultiTile.single(Tile('2', 2)));
+    twoDimensArrayMultiTile.put(1, 0, MultiTile.single(Tile('4', 2)));
     final initialBoard = Board(twoDimensArrayMultiTile);
 
     emit(PlayingGameState(
@@ -76,7 +75,7 @@ class GameBloc extends Cubit<GameState> {
       if (currentState.movingActor == MovingActor.player) {
         final Board output;
 
-        switch(moveDirection) {
+        switch (moveDirection) {
           case MoveDirection.up:
             output = _boardMover.moveTop(currentState.board);
             break;
@@ -90,13 +89,24 @@ class GameBloc extends Cubit<GameState> {
             output = _boardMover.moveLeft(currentState.board);
             break;
         }
-        print('EMIT NEW BOARD $output');
 
         emit(PlayingGameState(
           board: output,
-          movingActor: MovingActor.system,
+          movingActor: MovingActor.waitingForAnimation,
           // boardTransformerOutput: output,
         ));
+
+        Future.delayed(Duration(milliseconds: 1500)).then((value) {
+          final currentState = state;
+          if (currentState is PlayingGameState) {
+            final mergedBoard = _boardManager.merge(currentState.board);
+
+            emit(PlayingGameState(
+              board: mergedBoard,
+              movingActor: MovingActor.system,
+            ));
+          }
+        });
       }
     }
   }

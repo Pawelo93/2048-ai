@@ -10,12 +10,9 @@ class MultiTile extends Equatable {
     return MultiTile([tile]);
   }
 
-
-
-
   bool get isNotEmpty => tiles.isNotEmpty;
 
-  bool get isSingle => tiles.length <= 1;
+  bool get isSingle => tiles.length == 1;
 
   Tile? get firstOrNull => tiles.isNotEmpty ? tiles.first : null;
 
