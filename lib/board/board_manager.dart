@@ -21,7 +21,7 @@ class BoardManager {
     if (counter == 1) {
       return rotatedBoard;
     } else {
-      return rotate(board, counter - 1);
+      return rotate(rotatedBoard, counter - 1);
     }
   }
 
@@ -39,12 +39,10 @@ class BoardManager {
     return Board(newArray);
   }
 
-  var counter = 10;
   Tile mergeTiles(List<Tile> tiles) {
     final Tile tile1 = tiles[0];
     final Tile tile2 = tiles[1];
-    // final newId = const Uuid().v1();
-    final newId = (counter++).toString();
+    final newId = const Uuid().v1();
     final mergedTile = Tile(newId, tile1.value * tile2.value);
 
     return mergedTile;

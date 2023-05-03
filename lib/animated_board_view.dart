@@ -3,14 +3,17 @@ import 'package:game_2048/board/positioned_tile.dart';
 import 'package:game_2048/board_view.dart';
 
 class AnimatedBoardView extends StatelessWidget {
-  const AnimatedBoardView({Key? key, required this.positionedTiles,}) : super(key: key);
+  const AnimatedBoardView({
+    Key? key,
+    required this.positionedTiles,
+  }) : super(key: key);
 
   final List<PositionedTile> positionedTiles;
 
   @override
   Widget build(BuildContext context) {
     return BoardView(
-      positionedTiles: positionedTiles //..sort((a, b) => (a.position.x + a.position.y).compareTo(b.position.x + b.position.y)),
+      positionedTiles: positionedTiles,
     );
   }
 }

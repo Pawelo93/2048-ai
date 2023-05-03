@@ -10,7 +10,6 @@ import 'package:game_2048/board/tile.dart';
 import 'package:game_2048/board_mover.dart';
 import 'package:game_2048/game_controller.dart';
 import 'package:game_2048/two_dimens_array.dart';
-import 'package:uuid/uuid.dart';
 
 enum MovingActor {
   player,
@@ -55,7 +54,6 @@ class GameBloc extends Cubit<GameState> {
   GameBloc() : super(InitialGameState());
 
   void startGame() {
-    const uuid = Uuid();
     final TwoDimensArray twoDimensArrayMultiTile = TwoDimensArray(HashMap());
     twoDimensArrayMultiTile.put(1, 1, MultiTile.single(Tile('1', 2)));
     twoDimensArrayMultiTile.put(2, 3, MultiTile.single(Tile('3', 8)));
@@ -96,7 +94,7 @@ class GameBloc extends Cubit<GameState> {
           // boardTransformerOutput: output,
         ));
 
-        Future.delayed(Duration(milliseconds: 1500)).then((value) {
+        Future.delayed(const Duration(milliseconds: 160)).then((value) {
           final currentState = state;
           if (currentState is PlayingGameState) {
             final mergedBoard = _boardManager.merge(currentState.board);

@@ -17,50 +17,19 @@ class BoardMover {
     return backRotatedBoard;
   }
 
-  Board moveDown(Board board) {
-    return board;
-  }
-
   Board moveRight(Board board) {
-    return board;
+    final rotatedBoard = boardManager.rotate(board, 2);
+    final transformedBoard = boardManager.transform(rotatedBoard);
+    final backRotatedBoard = boardManager.rotate(transformedBoard, 2);
+
+    return backRotatedBoard;
   }
 
-  // BoardTransformerOutput moveRight(Board board) {
-  //   final rotatedBoard = boardManager.rotate(board, 2);
-  //
-  //   final rotation1 = BoardRotator().rotate(board);
-  //   final rotation2 =  BoardRotator().rotate(rotation1);
-  //
-  //   final transformation = BoardTransformer().transform(rotation2);
-  //   final reRotation1 =  BoardRotator().rotate(transformation.newBoard);
-  //   final reRotation2 =  BoardRotator().rotate(reRotation1);
-  //
-  //   final PositionRotator positionRotator = PositionRotator();
-  //   final transforms = transformation.transforms
-  //       .map((e) => MoveTransform(positionRotator.rotate(e.from), positionRotator.rotate(e.to), e.value))
-  //       .map((e) => MoveTransform(positionRotator.rotate(e.from), positionRotator.rotate(e.to), e.value))
-  //       .toList();
-  //
-  //   return BoardTransformerOutput(reRotation2, board, transforms);
-  // }
-  //
-  // BoardTransformerOutput moveDown(Board board) {
-  //   final rotatedBoard = boardManager.rotate(board, 1);
-  //
-  //   final rotation1 = BoardRotator().rotate(board);
-  //
-  //   final transformation = BoardTransformer().transform(rotation1);
-  //   final reRotation1 =  BoardRotator().rotate(transformation.newBoard);
-  //   final reRotation2 =  BoardRotator().rotate(reRotation1);
-  //   final reRotation3 =  BoardRotator().rotate(reRotation2);
-  //
-  //   final PositionRotator positionRotator = PositionRotator();
-  //   final transforms = transformation.transforms
-  //       .map((e) => MoveTransform(positionRotator.rotate(e.from), positionRotator.rotate(e.to), e.value))
-  //       .map((e) => MoveTransform(positionRotator.rotate(e.from), positionRotator.rotate(e.to), e.value))
-  //       .map((e) => MoveTransform(positionRotator.rotate(e.from), positionRotator.rotate(e.to), e.value))
-  //       .toList();
-  //
-  //   return BoardTransformerOutput(reRotation3, board, transforms);
-  // }
+  Board moveDown(Board board) {
+    final rotatedBoard = boardManager.rotate(board, 1);
+    final transformedBoard = boardManager.transform(rotatedBoard);
+    final backRotatedBoard = boardManager.rotate(transformedBoard, 3);
+
+    return backRotatedBoard;
+  }
 }

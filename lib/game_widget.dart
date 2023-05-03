@@ -65,7 +65,6 @@ class GamePlayingStateView extends StatelessWidget {
   }) : super(key: key);
 
   final Board board;
-  // final BoardTransformerOutput? boardTransformerOutput;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +72,6 @@ class GamePlayingStateView extends StatelessWidget {
       children: [
         AnimatedBoardView(
           positionedTiles: board.toPositionedTiles(),
-          // boardTransformerOutput: boardTransformerOutput,
         ),
       ],
     );

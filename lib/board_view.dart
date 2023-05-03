@@ -60,7 +60,7 @@ class BoardView extends StatelessWidget {
           ...positionedTiles.where((tile) => tile.value > 0).map((item) {
             return AnimatedPositioned(
               key: ValueKey(item.id),
-              duration: const Duration(milliseconds: 1000),
+              duration: const Duration(milliseconds: 150),
               left: item.position.x * (width + gap),
               top: item.position.y * (height + gap),
               child: TileItem(
@@ -76,7 +76,7 @@ class BoardView extends StatelessWidget {
   }
 }
 
-class TileItem extends StatelessWidget {
+class TileItem extends StatefulWidget {
   const TileItem({
     Key? key,
     required this.tile,
@@ -89,32 +89,40 @@ class TileItem extends StatelessWidget {
   final double height;
 
   @override
+  State<TileItem> createState() => _TileItemState();
+}
+
+class _TileItemState extends State<TileItem>
+    with SingleTickerProviderStateMixin {
+  final Tween<double> _tween = Tween(begin: 0.6, end: 1.0);
+  late AnimationController _animationController;
+  late CurvedAnimation _curvedAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _curvedAnimation = CurvedAnimation(parent: _animationController, curve: Curves.bounceInOut);
+    _animationController.forward();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      // key: ValueKey(tile.id),
-      // key: ValueKey(tile.value),
-      duration: const Duration(milliseconds: 1000),
-      switchInCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        print('ANIM ${animation.value}');
-        final tween =
-            Tween(begin: 0.6, end: 1.0).chain(CurveTween(curve: Curves.ease));
-        return ScaleTransition(
-          key: ValueKey(tile.value),
-          scale: tween.animate(animation),
-          child: child,
-        );
-      },
+    return ScaleTransition(
+      scale: _tween.animate(_curvedAnimation),
       child: Container(
-        width: width,
-        height: height,
+        width: widget.width,
+        height: widget.height,
         decoration: BoxDecoration(
-          color: getItemColor(tile.value),
+          color: getItemColor(widget.tile.value),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Center(
           child: Text(
-            tile.value.toString(),
+            widget.tile.value.toString(),
             style: const TextStyle(
               color: Color(0xFF776e65),
               fontSize: 40,
