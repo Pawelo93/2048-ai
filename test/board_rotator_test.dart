@@ -1,53 +1,49 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_2048/board.dart';
-import 'package:game_2048/board_rotator.dart';
+import 'package:game_2048/board/board.dart';
+import 'package:game_2048/board/board_rotator.dart';
+import 'package:game_2048/board/multi_tile.dart';
+import 'package:game_2048/board/row/row.dart';
+import 'package:game_2048/board/tile.dart';
+import 'package:game_2048/list_to_two_dimens_array_mapper.dart';
+import 'package:game_2048/two_dimens_array.dart';
 
 void main() {
-  final boardFlipper = BoardRotator();
+  final BoardRotator boardRotator = BoardRotator();
+  test('rotate test 1', () {
+    final tiles = ListToTwoDimensArrayMapper.map([
+      [Tile('1', 1)], [], [], [],
+      [], [Tile('2', 2)], [], [],
+      [], [], [Tile('3', 3)], [],
+      [], [], [], [Tile('4', 4)],
+    ]);
+    final board = Board(tiles);
 
-  test('flip 1', () {
-    final startBoard = Board.fromList(
-      [
-        [1, 2, 3, 4],
-        [5, 6, 7, 8],
-        [9, 10, 11, 12],
-        [13, 14, 15, 16],
-      ],
-    );
+    final rotatedTiles = ListToTwoDimensArrayMapper.map([
+      [], [], [], [Tile('1', 1)],
+      [], [], [Tile('2', 2)], [],
+      [], [Tile('3', 3)], [], [],
+      [Tile('4', 4)], [], [], [],
+    ]);
+    final rotatedBoard = Board(rotatedTiles);
 
-    final endBoard = Board.fromList(
-      [
-        [13, 9, 5, 1],
-        [14, 10, 6, 2],
-        [15, 11, 7, 3],
-        [16, 12, 8, 4],
-      ],
-    );
-
-    final result = boardFlipper.rotate(startBoard);
-    expect(result, endBoard);
+    expect(boardRotator.rotate(board), rotatedBoard);
   });
 
-  test('flip 2', () {
-    final startBoard = Board.fromList(
-      [
-        [2, 0, 0, 0],
-        [2, 4, 0, 0],
-        [2, 0, 4, 0],
-        [2, 0, 0, 4],
-      ],
-    );
-
-    final endBoard = Board.fromList(
-      [
-        [2, 2, 2, 2],
-        [0, 0, 4, 0],
-        [0, 4, 0, 0],
-        [4, 0, 0, 0],
-      ],
-    );
-
-    final result = boardFlipper.rotate(startBoard);
-    expect(result, endBoard);
-  });
+  // test('rotate test 1', () {
+  //   final array = TwoDimensArrayMultiTile();
+  //   array.put(0, 0, MultiTile([Tile('1', 1)]);
+  //       Row([[Tile('1', 1)], [], [], []]),
+  //   Row([[], [Tile('2', 2)], [], []]),
+  //   Row([[], [], [Tile('3', 3)], []]),
+  //   Row([[], [], [], [Tile('4', 4)]]),
+  //   const board = Board(array);
+  //
+  //   const rotatedBoard = Board([
+  //     Row([[], [], [], [Tile('1', 1)]]),
+  //     Row([[], [], [Tile('2', 2)], []]),
+  //     Row([[], [Tile('3', 3)], [], []]),
+  //     Row([[Tile('4', 4)], [], [], []]),
+  //   ]);
+  //   expect(boardRotator.rotate(board), rotatedBoard);
+  // });
 }

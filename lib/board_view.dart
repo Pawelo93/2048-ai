@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:game_2048/board.dart';
+import 'package:game_2048/board/board_item.dart';
+import 'package:game_2048/board/positioned_tile.dart';
 import 'package:game_2048/model/position.dart';
 
 const Color color2 = Color(0xFFeee4da);
@@ -12,20 +11,18 @@ const Color color32 = Color(0xFFf77c5f);
 const Color color64 = Color(0xFFf75f3c);
 
 class BoardView extends StatelessWidget {
-  const BoardView({Key? key, required this.board}) : super(key: key);
+  const BoardView({Key? key, required this.positionedTiles,}) : super(key: key);
 
-  final Board board;
+  final List<PositionedTile> positionedTiles;
 
   @override
   Widget build(BuildContext context) {
-    final items = <Position>[];
+    final backgroundItems = <Position>[];
     for (var i = 0; i < 4; i++) {
       for (var j = 0; j < 4; j++) {
-        items.add(Position(j.toDouble(), i.toDouble()));
+        backgroundItems.add(Position(j.toDouble(), i.toDouble()));
       }
     }
-
-    final List<BoardItem> movingItems = board.items;
 
     final boardWidth = MediaQuery.of(context).size.width / 2;
     final boardHeight = boardWidth;
@@ -44,7 +41,7 @@ class BoardView extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          ...items.map((item) {
+          ...backgroundItems.map((item) {
             return Positioned(
               left: item.x * (width + gap),
               top: item.y * (height + gap),
@@ -58,8 +55,10 @@ class BoardView extends StatelessWidget {
               ),
             );
           }),
-          ...movingItems.map((item) {
-            return Positioned(
+          ...positionedTiles.where((tile) => tile.value > 0).map((item) {
+            return AnimatedPositioned(
+              key: ValueKey(item.id),
+              duration: const Duration(milliseconds: 300),
               left: item.position.x * (width + gap),
               top: item.position.y * (height + gap),
               child: AnimatedSwitcher(

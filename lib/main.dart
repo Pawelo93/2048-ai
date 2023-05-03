@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:game_2048/animated_board_view.dart';
-import 'package:game_2048/animating_board.dart';
-import 'package:game_2048/model/position.dart';
+import 'package:game_2048/game_widget.dart';
+import 'package:game_2048/test_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -30,22 +29,12 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  AnimatingBoard board = AnimatingBoard()
-    ..add(AnimatingBoardItem(Position(1, 1), Position(1, 1), Position(1, 1), 2))
-    ..add(AnimatingBoardItem(Position(3, 1), Position(3, 1), Position(3, 1), 2))
-    ..add(AnimatingBoardItem(Position(2, 3), Position(2, 3), Position(2, 3), 2))
-    ..add(AnimatingBoardItem(Position(1, 0), Position(1, 0), Position(1, 0), 2));
-
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(
-        children: [
-          AnimatedBoardView(animatingBoard: board),
-        ],
-      ),
+    return const Material(
+      child: GameWidget(),
     );
   }
 }
-
