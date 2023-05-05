@@ -54,6 +54,73 @@ class SingleRowTransformer {
       }
     }
 
+    if (tilesCount == 3) {
+      List<Tile> threeTiles = tiles.values.where((element) => element != null && element.firstOrNull != null).map((e) => e?.firstOrNull).map((e) => e as Tile).toList();
+      final first = threeTiles[0];
+      final second = threeTiles[1];
+      final third = threeTiles[2];
+
+      if (first.value == second.value) {
+        return Row({
+          0: MultiTile([first, second]),
+          1: MultiTile.single(third),
+        });
+      } else if (second.value == third.value){
+        return Row({
+          0: MultiTile.single(first),
+          1: MultiTile([second, third]),
+        });
+      } else {
+        return Row({
+          0: MultiTile.single(first),
+          1: MultiTile.single(second),
+          2: MultiTile.single(third),
+        });
+      }
+    }
+
+    if (tilesCount == 4) {
+      List<Tile> fourTiles = tiles.values.where((element) => element != null && element.firstOrNull != null).map((e) => e?.firstOrNull).map((e) => e as Tile).toList();
+      final first = fourTiles[0];
+      final second = fourTiles[1];
+      final third = fourTiles[2];
+      final fourth = fourTiles[3];
+
+      if (first.value == second.value) {
+        if (third.value == fourth.value) {
+          return Row({
+            0: MultiTile([first, second]),
+            1: MultiTile([third, fourth]),
+          });
+        } else {
+          return Row({
+            0: MultiTile([first, second]),
+            1: MultiTile.single(third),
+            2: MultiTile.single(fourth),
+          });
+        }
+      } else if (second.value == third.value) {
+        return Row({
+          0: MultiTile.single(first),
+          1: MultiTile([second, third]),
+          2: MultiTile.single(fourth),
+        });
+      } else if (third.value == fourth.value) {
+        return Row({
+          0: MultiTile.single(first),
+          1: MultiTile.single(second),
+          2: MultiTile([third, fourth]),
+        });
+      } else {
+        return Row({
+          0: MultiTile.single(first),
+          1: MultiTile.single(second),
+          2: MultiTile.single(third),
+          3: MultiTile.single(fourth),
+        });
+      }
+    }
+
     return row;
   }
 

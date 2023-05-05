@@ -55,9 +55,9 @@ class GameBloc extends Cubit<GameState> {
 
   void startGame() {
     final TwoDimensArray twoDimensArrayMultiTile = TwoDimensArray(HashMap());
-    twoDimensArrayMultiTile.put(1, 1, MultiTile.single(Tile('1', 2)));
+    twoDimensArrayMultiTile.put(1, 2, MultiTile.single(Tile('1', 2)));
     twoDimensArrayMultiTile.put(2, 3, MultiTile.single(Tile('3', 8)));
-    twoDimensArrayMultiTile.put(3, 1, MultiTile.single(Tile('2', 2)));
+    twoDimensArrayMultiTile.put(1, 0, MultiTile.single(Tile('2', 4)));
     twoDimensArrayMultiTile.put(1, 0, MultiTile.single(Tile('4', 2)));
     final initialBoard = Board(twoDimensArrayMultiTile);
 
@@ -112,9 +112,9 @@ class GameBloc extends Cubit<GameState> {
   void systemMove() {
     final currentState = state;
     if (currentState is PlayingGameState) {
-      print('SYSTEM MOVES');
+      final addNewTile = _boardManager.addRandomTile(currentState.board);
       emit(PlayingGameState(
-        board: currentState.board,
+        board: addNewTile,
         movingActor: MovingActor.player,
       ));
     }

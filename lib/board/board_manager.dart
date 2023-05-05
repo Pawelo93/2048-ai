@@ -1,16 +1,14 @@
-import 'dart:collection';
-
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_rotator.dart';
+import 'package:game_2048/board/board_tile_merger.dart';
 import 'package:game_2048/board/board_transformer.dart';
-import 'package:game_2048/board/multi_tile.dart';
-import 'package:game_2048/board/tile.dart';
-import 'package:game_2048/two_dimens_array.dart';
-import 'package:uuid/uuid.dart';
+import 'package:game_2048/board/random_tile_adder.dart';
 
 class BoardManager {
   final BoardTransformer _boardTransformer = BoardTransformer();
   final BoardRotator _boardRotator = BoardRotator();
+  final BoardTileMerger _boardTileMerger = BoardTileMerger();
+  final RandomTileAdder _randomTileAdder = RandomTileAdder();
 
   Board transform(Board board) {
     return _boardTransformer.transform(board);
@@ -26,26 +24,10 @@ class BoardManager {
   }
 
   Board merge(Board board) {
-    final newArray = TwoDimensArray(HashMap());
-    board.array.items.forEach((key, value) {
-      if (!value.isSingle) {
-        final merged = mergeTiles(value.tiles);
-        newArray.put(key.intX, key.intY, MultiTile.single(merged));
-      } else {
-        newArray.put(key.intX, key.intY, value);
-      }
-    });
-
-    return Board(newArray);
+    return _boardTileMerger.merge(board);
   }
 
-  Tile mergeTiles(List<Tile> tiles) {
-    final Tile tile1 = tiles[0];
-    final Tile tile2 = tiles[1];
-    final newId = const Uuid().v1();
-    final mergedTile = Tile(newId, tile1.value * tile2.value);
-
-    return mergedTile;
+  Board addRandomTile(Board board) {
+    return _randomTileAdder.addRandom(board);
   }
-
 }

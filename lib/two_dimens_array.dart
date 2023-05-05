@@ -17,7 +17,8 @@ class TwoDimensArray extends Equatable {
 
   List<MultiTile> getRow(int y) {
     final keys = items.keys.where((element) => element.y == y).toList();
-    return items.entries.where((element) => keys.contains(element.key)).map((e) => e.value).toList();
+    final sortedKeys = List.of(keys)..sort((a, b) => a.x.compareTo(b.x));
+    return sortedKeys.map((e) => items[e]).where((element) => element != null).map((e) => e as MultiTile).toList();
   }
 
   @override

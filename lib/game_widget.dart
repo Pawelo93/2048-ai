@@ -39,8 +39,7 @@ class GameView extends StatelessWidget {
         listener: (context, state) {
           if (state is PlayingGameState) {
             if (state.movingActor == MovingActor.system) {
-              Future.delayed(Duration(milliseconds: 1500)).then((value) => context.read<GameBloc>().systemMove());
-              // context.read<GameBloc>().systemMove();
+              context.read<GameBloc>().systemMove();
             }
           }
         },
