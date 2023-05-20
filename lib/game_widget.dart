@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/animated_board_view.dart';
+import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/board.dart';
+import 'package:game_2048/board_view.dart';
 import 'package:game_2048/game_bloc.dart';
+import 'package:game_2048/score/score_bloc.dart';
+import 'package:game_2048/ui_item.dart';
 
 class GameWidget extends StatelessWidget {
   const GameWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<GameBloc>(
-      create: (_) => GameBloc()..startGame(),
-      child: const GameView(),
-    );
+    return const GameView();
   }
 }
 
@@ -22,9 +23,12 @@ class GameView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: FocusNode(),
-      onKey: (event) {
+    return KeyboardListener(
+      focusNode: FocusNode()..requestFocus(),
+      onKeyEvent: (event) {
+        if (event is KeyUpEvent) {
+          return;
+        }
         if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
           context.read<GameBloc>().move(MoveDirection.left);
         } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
@@ -38,13 +42,56 @@ class GameView extends StatelessWidget {
       child: BlocConsumer<GameBloc, GameState>(
         listener: (context, state) {
           if (state is PlayingGameState) {
+            if (state.addToScore > 0) {
+              context.read<ScoreBloc>().addScore(state.addToScore);
+            }
             if (state.movingActor == MovingActor.system) {
               context.read<GameBloc>().systemMove();
+            }
+          } else if (state is WaitingGameState) {
+            if (state.waitingGameType == WaitingGameType.gameOver) {
+              context.read<ScoreBloc>().updateBestScore();
             }
           }
         },
         builder: (context, state) {
-          if (state is PlayingGameState) {
+          if (state is WaitingGameState) {
+            return Stack(
+              children: [
+                Opacity(
+                  opacity: 0.3,
+                  child: BoardView(
+                    positionedTiles: state.board.toPositionedTiles(),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const Text(
+                          'Game over!',
+                          style: TextStyle(
+                            color: AppColors.tileTextColor,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TryAgainButton(
+                          onClick: () {
+                            context.read<ScoreBloc>().clear();
+                            context.read<GameBloc>().startGame();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else if (state is PlayingGameState) {
             return GamePlayingStateView(
               board: state.board,
             );

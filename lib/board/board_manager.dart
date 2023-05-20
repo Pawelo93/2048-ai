@@ -23,7 +23,7 @@ class BoardManager {
     }
   }
 
-  Board merge(Board board) {
+  MergeResult merge(Board board) {
     return _boardTileMerger.merge(board);
   }
 

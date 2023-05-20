@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/positioned_tile.dart';
+import 'package:game_2048/game_bloc.dart';
 import 'package:game_2048/model/position.dart';
-
-const Color color2 = Color(0xFFeee4da);
-const Color color4 = Color(0xFFeee1ca);
-const Color color8 = Color(0xFFf3b279);
-const Color color16 = Color(0xFFf69564);
-const Color color32 = Color(0xFFf77c5f);
-const Color color64 = Color(0xFFf75f3c);
 
 class BoardView extends StatelessWidget {
   const BoardView({
@@ -38,7 +34,7 @@ class BoardView extends StatelessWidget {
       height: boardHeight,
       padding: const EdgeInsets.all(gap),
       decoration: BoxDecoration(
-        color: const Color(0xFFbcac9f),
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Stack(
@@ -51,7 +47,7 @@ class BoardView extends StatelessWidget {
               height: height,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFccc1b4),
+                  color: AppColors.lightBackground,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -60,9 +56,12 @@ class BoardView extends StatelessWidget {
           ...positionedTiles.where((tile) => tile.value > 0).map((item) {
             return AnimatedPositioned(
               key: ValueKey(item.id),
-              duration: const Duration(milliseconds: 150),
+              duration: const Duration(milliseconds: animationSpeed),
               left: item.position.x * (width + gap),
               top: item.position.y * (height + gap),
+              onEnd: () {
+                context.read<GameBloc>().animationEnd();
+              },
               child: TileItem(
                 tile: item,
                 width: width,
@@ -103,7 +102,7 @@ class _TileItemState extends State<TileItem>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: animationSpeed),
     );
     _curvedAnimation = CurvedAnimation(parent: _animationController, curve: Curves.bounceInOut);
     _animationController.forward();
@@ -123,9 +122,9 @@ class _TileItemState extends State<TileItem>
         child: Center(
           child: Text(
             widget.tile.value.toString(),
-            style: const TextStyle(
-              color: Color(0xFF776e65),
-              fontSize: 40,
+            style: TextStyle(
+              color: AppColors.tileTextColor,
+              fontSize: getSize(widget.tile.value),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -137,17 +136,41 @@ class _TileItemState extends State<TileItem>
   Color getItemColor(int value) {
     switch (value) {
       case 2:
-        return color2;
+        return AppColors.color2;
       case 4:
-        return color4;
+        return AppColors.color4;
       case 8:
-        return color8;
+        return AppColors.color8;
       case 16:
-        return color16;
+        return AppColors.color16;
       case 32:
-        return color32;
+        return AppColors.color32;
+      case 64:
+        return AppColors.color64;
+      case 128:
+        return AppColors.color128;
+      case 256:
+        return AppColors.color256;
+      case 512:
+        return AppColors.color512;
+      case 1024:
+        return AppColors.color1024;
+      case 2048:
+        return AppColors.color2048;
       default:
-        return const Color(0xFFccc1b4);
+        return AppColors.color4096;
+    }
+  }
+
+  double getSize(int value) {
+    if (value < 100) {
+      return 40;
+    } else if (value < 1000) {
+      return 30;
+    } else if (value < 10000) {
+      return 20;
+    } else {
+      return 14;
     }
   }
 }

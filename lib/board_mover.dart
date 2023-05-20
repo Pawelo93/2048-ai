@@ -1,9 +1,23 @@
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_manager.dart';
+import 'package:game_2048/game_bloc.dart';
 
 class BoardMover {
 
   final BoardManager boardManager = BoardManager();
+
+  Board move(Board board, MoveDirection moveDirection) {
+    switch (moveDirection) {
+      case MoveDirection.up:
+        return moveTop(board);
+      case MoveDirection.down:
+        return moveDown(board);
+      case MoveDirection.right:
+        return moveRight(board);
+      case MoveDirection.left:
+        return moveLeft(board);
+    }
+  }
 
   Board moveLeft(Board board) {
     return boardManager.transform(board);
@@ -31,5 +45,10 @@ class BoardMover {
     final backRotatedBoard = boardManager.rotate(transformedBoard, 3);
 
     return backRotatedBoard;
+  }
+
+  bool isMoveValid(Board board, MoveDirection moveDirection) {
+    final newBoard = move(board, moveDirection);
+    return board != newBoard;
   }
 }
