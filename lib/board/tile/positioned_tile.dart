@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:game_2048/model/position.dart';
+import 'package:game_2048/board/util/position.dart';
 
 class PositionedTile extends Equatable {
   final String id;

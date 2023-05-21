@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:game_2048/board/tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
 
 class MultiTile extends Equatable {
   final List<Tile> tiles;

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_2048/board/multi_tile.dart';
-import 'package:game_2048/board/tile.dart';
-import 'package:game_2048/list_to_two_dimens_array_mapper.dart';
-import 'package:game_2048/model/position.dart';
-import 'package:game_2048/two_dimens_array.dart';
+import 'package:game_2048/board/tile/multi_tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
+import '../lib/board/util/list_to_two_dimens_array_mapper.dart';
+import 'package:game_2048/board/util/position.dart';
+import 'package:game_2048/board/util/two_dimens_array.dart';
 
 void main() {
   test('mapper test', () {

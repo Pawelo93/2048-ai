@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/app_colors.dart';
-import 'package:game_2048/game_bloc.dart';
-import 'package:game_2048/game_widget.dart';
+import 'package:game_2048/game/game_bloc.dart';
+import 'package:game_2048/game/game_widget.dart';
 import 'package:game_2048/score/best_score_widget.dart';
 import 'package:game_2048/score/score_animated_widget.dart';
 import 'package:game_2048/score/score_bloc.dart';
-import 'package:game_2048/ui_item.dart';
+import 'package:game_2048/ui/ui_item.dart';
 
 class HomePageUi extends StatelessWidget {
   const HomePageUi({Key? key}) : super(key: key);

@@ -2,7 +2,7 @@ import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_rotator.dart';
 import 'package:game_2048/board/board_tile_merger.dart';
 import 'package:game_2048/board/board_transformer.dart';
-import 'package:game_2048/board/random_tile_adder.dart';
+import 'package:game_2048/board/tile/random_tile_adder.dart';
 
 class BoardManager {
   final BoardTransformer _boardTransformer = BoardTransformer();

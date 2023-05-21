@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_2048/board/multi_tile.dart';
+import 'package:game_2048/board/tile/multi_tile.dart';
 import 'package:game_2048/board/row/row.dart';
 import 'package:game_2048/board/row/single_row_transformer.dart';
-import 'package:game_2048/board/tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
 
 void main() {
   final SingleRowTransformer singleRowTransformer = SingleRowTransformer();

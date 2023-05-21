@@ -1,8 +1,8 @@
 import 'dart:collection';
 
-import 'package:game_2048/board/multi_tile.dart';
-import 'package:game_2048/board/tile.dart';
-import 'package:game_2048/two_dimens_array.dart';
+import 'package:game_2048/board/tile/multi_tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
+import 'package:game_2048/board/util/two_dimens_array.dart';
 
 class ListToTwoDimensArrayMapper {
   static TwoDimensArray map(List<List<Tile>> tiles) {

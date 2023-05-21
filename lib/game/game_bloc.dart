@@ -4,11 +4,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_manager.dart';
-import 'package:game_2048/board/multi_tile.dart';
-import 'package:game_2048/board/tile.dart';
-import 'package:game_2048/board_mover.dart';
-import 'package:game_2048/game_controller.dart';
-import 'package:game_2048/two_dimens_array.dart';
+import 'package:game_2048/board/tile/multi_tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
+import 'package:game_2048/board/board_mover.dart';
+import 'package:game_2048/board/util/two_dimens_array.dart';
 
 const int animationSpeed = 50;
 
@@ -66,7 +65,6 @@ class PlayingGameState extends GameState {
 }
 
 class GameBloc extends Cubit<GameState> {
-  final GameController gameController = GameController();
   final BoardMover _boardMover = BoardMover();
   final BoardManager _boardManager = BoardManager();
 

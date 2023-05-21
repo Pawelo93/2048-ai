@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_2048/app_colors.dart';
-import 'package:game_2048/home_page_ui.dart';
+import 'package:game_2048/ui/home_page_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {

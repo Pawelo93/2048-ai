@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:game_2048/board/board.dart';
-import 'package:game_2048/two_dimens_array.dart';
+import 'package:game_2048/board/util/two_dimens_array.dart';
 
 class BoardRotator {
   Board rotate(Board board) {

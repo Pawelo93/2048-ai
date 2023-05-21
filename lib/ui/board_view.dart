@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/app_colors.dart';
-import 'package:game_2048/board/positioned_tile.dart';
-import 'package:game_2048/game_bloc.dart';
-import 'package:game_2048/model/position.dart';
+import 'package:game_2048/board/tile/positioned_tile.dart';
+import 'package:game_2048/game/game_bloc.dart';
+import 'package:game_2048/board/util/position.dart';
 
 class BoardView extends StatelessWidget {
   const BoardView({

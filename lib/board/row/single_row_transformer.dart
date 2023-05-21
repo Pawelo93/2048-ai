@@ -1,6 +1,6 @@
-import 'package:game_2048/board/multi_tile.dart';
+import 'package:game_2048/board/tile/multi_tile.dart';
 import 'package:game_2048/board/row/row.dart';
-import 'package:game_2048/board/tile.dart';
+import 'package:game_2048/board/tile/tile.dart';
 
 class SingleRowTransformer {
   Row transform(Row row) {
