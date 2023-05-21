@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_2048/ai/ai_manager.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/game/game_bloc.dart';
+import 'package:game_2048/game_mode.dart';
+import 'package:game_2048/main.dart';
 import 'package:game_2048/score/score_bloc.dart';
 import 'package:game_2048/ui/board_view.dart';
 import 'package:game_2048/ui/ui_item.dart';
@@ -13,18 +16,27 @@ class GameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const GameView();
+    return GameView();
   }
 }
 
 class GameView extends StatelessWidget {
-  const GameView({Key? key}) : super(key: key);
+  GameView({Key? key}) : super(key: key);
+
+  final AiManager aiManager = AiManager();
+
+  bool stepper = false;
+  bool lock = false;
 
   @override
   Widget build(BuildContext context) {
     return KeyboardListener(
-      focusNode: FocusNode()..requestFocus(),
+      focusNode: FocusNode()
+        ..requestFocus(),
       onKeyEvent: (event) {
+        if (gameMode == GameMode.ai) {
+          return;
+        }
         if (event is KeyUpEvent) {
           return;
         }
@@ -39,13 +51,17 @@ class GameView extends StatelessWidget {
         }
       },
       child: BlocConsumer<GameBloc, GameState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is PlayingGameState) {
             if (state.addToScore > 0) {
               context.read<ScoreBloc>().addScore(state.addToScore);
             }
             if (state.movingActor == MovingActor.system) {
               context.read<GameBloc>().systemMove();
+            }
+            if (gameMode == GameMode.ai &&
+                state.movingActor == MovingActor.player) {
+              await moveAi(context);
             }
           } else if (state is WaitingGameState) {
             if (state.waitingGameType == WaitingGameType.gameOver) {
@@ -91,8 +107,24 @@ class GameView extends StatelessWidget {
               ],
             );
           } else if (state is PlayingGameState) {
-            return GamePlayingStateView(
-              board: state.board,
+            return Column(
+              children: [
+                GamePlayingStateView(
+                  board: state.board,
+                ),
+                if (gameMode == GameMode.ai)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: RunAiButton(
+                      onClick: () {
+                        if (stepper) {
+                          lock = false;
+                        }
+                        moveAi(context);
+                      },
+                    ),
+                  ),
+              ],
             );
           }
 
@@ -100,6 +132,28 @@ class GameView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> moveAi(BuildContext context) async {
+    if (lock) {
+      return Future.value();
+    }
+
+    return Future.delayed(Duration(milliseconds: 5)).then((value) async {
+      final currentState = context
+          .read<GameBloc>()
+          .state;
+
+      if (currentState is PlayingGameState) {
+        final aiMove = await aiManager.findBestMove(currentState.board);
+        context.read<GameBloc>().move(aiMove);
+        context.read<GameBloc>().animationEnd();
+
+        if (stepper) {
+          lock = true;
+        }
+      }
+    });
   }
 }
 

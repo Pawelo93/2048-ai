@@ -54,9 +54,11 @@ class ScoreBloc extends Cubit<ScoreState> {
   }
 
   void updateBestScore() async {
-    final bestScore = state.score;
-    emit(state.copyWith(bestScore: bestScore));
-    await _bestScoreRepository.set(bestScore);
+    if (state.score > state.bestScore) {
+      final bestScore = state.score;
+      emit(state.copyWith(bestScore: bestScore));
+      await _bestScoreRepository.set(bestScore);
+    }
   }
 
   void clear() {

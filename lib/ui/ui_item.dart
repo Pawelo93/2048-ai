@@ -65,6 +65,37 @@ class NewGameButton extends StatelessWidget {
   }
 }
 
+
+class RunAiButton extends StatelessWidget {
+  const RunAiButton({
+    Key? key,
+    required this.onClick,
+  }) : super(key: key);
+
+  final Function() onClick;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onClick,
+      child: const UiItem(
+        background: AppColors.darkBackground,
+        child: Padding(
+          padding: EdgeInsets.all(4),
+          child: Text(
+            'Run AI',
+            style: TextStyle(
+              color: AppColors.valueTextColor,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class TryAgainButton extends StatelessWidget {
   const TryAgainButton({
     Key? key,

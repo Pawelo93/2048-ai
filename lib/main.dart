@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:game_2048/app_colors.dart';
+import 'package:game_2048/game_mode.dart';
 import 'package:game_2048/ui/home_page_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+const GameMode gameMode = GameMode.ai;
 
 void main() {
   runApp(const MyApp());

@@ -8,8 +8,10 @@ import 'package:game_2048/board/tile/multi_tile.dart';
 import 'package:game_2048/board/tile/tile.dart';
 import 'package:game_2048/board/board_mover.dart';
 import 'package:game_2048/board/util/two_dimens_array.dart';
+import 'package:game_2048/game_mode.dart';
+import 'package:game_2048/main.dart';
 
-const int animationSpeed = 50;
+const int animationSpeed = gameMode == GameMode.ai ? 5 : 50;
 
 enum WaitingGameType {
   beforeStart,

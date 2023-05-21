@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/game/game_bloc.dart';
 import 'package:game_2048/game/game_widget.dart';
+import 'package:game_2048/game_mode.dart';
+import 'package:game_2048/main.dart';
 import 'package:game_2048/score/best_score_widget.dart';
 import 'package:game_2048/score/score_animated_widget.dart';
 import 'package:game_2048/score/score_bloc.dart';
@@ -77,9 +79,9 @@ class GameStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      'MODE: normal game',
-      style: TextStyle(
+    return Text(
+      '$gameMode',
+      style: const TextStyle(
         color: AppColors.tileTextColor,
         fontSize: 13,
         fontWeight: FontWeight.bold,
