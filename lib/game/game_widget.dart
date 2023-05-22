@@ -61,7 +61,7 @@ class GameView extends StatelessWidget {
             }
             if (gameMode == GameMode.ai &&
                 state.movingActor == MovingActor.player) {
-              await moveAi(context);
+              moveAi(context);
             }
           } else if (state is WaitingGameState) {
             if (state.waitingGameType == WaitingGameType.gameOver) {
@@ -134,26 +134,24 @@ class GameView extends StatelessWidget {
     );
   }
 
-  Future<void> moveAi(BuildContext context) async {
+  void moveAi(BuildContext context) async {
     if (lock) {
-      return Future.value();
+      return;
     }
 
-    return Future.delayed(Duration(milliseconds: 5)).then((value) async {
-      final currentState = context
-          .read<GameBloc>()
-          .state;
+    await Future.delayed(Duration(milliseconds: 1));
 
-      if (currentState is PlayingGameState) {
-        final aiMove = await aiManager.findBestMove(currentState.board);
-        context.read<GameBloc>().move(aiMove);
-        context.read<GameBloc>().animationEnd();
+    final currentState = context.read<GameBloc>().state;
 
-        if (stepper) {
-          lock = true;
-        }
+    if (currentState is PlayingGameState) {
+      final aiMove = await aiManager.findBestMove(currentState.board);
+      context.read<GameBloc>().move(aiMove);
+      context.read<GameBloc>().animationEnd();
+
+      if (stepper) {
+        lock = true;
       }
-    });
+    }
   }
 }
 

@@ -1,5 +1,8 @@
+import 'dart:isolate';
+
 import 'package:dart_numerics/dart_numerics.dart' as numerics;
 import 'package:equatable/equatable.dart';
+import 'package:game_2048/ai/score_calculator.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_mover.dart';
 import 'package:game_2048/board/board_tile_merger.dart';
@@ -16,31 +19,32 @@ class MiniMax {
   final TileAdder _tileAdder = TileAdder();
   final BoardMover _boardMover = BoardMover();
   final BoardTileMerger _boardTileMerger = BoardTileMerger();
+  final ScoreCalculator _scoreCalculator = ScoreCalculator();
 
-  MiniMaxResult minimax(
+  Future<MiniMaxResult> minimax(
     Board board,
     int depth,
     MaximizingPlayer maximizingPlayer,
     int points,
-  ) {
+  ) async {
     MoveDirection bestDirection = MoveDirection.left;
 
     if (depth == 0) {
-      final score = calculateScore(board, points);
+      final score = _scoreCalculator.calculate(board, points);
       return MiniMaxResult(score, bestDirection);
     }
 
     if (maximizingPlayer == MaximizingPlayer.player) {
-      final moveResult = checkPlayerMoves(board, depth, -9999999);
+      final moveResult = await checkPlayerMoves(board, depth, -9999999);
       bestDirection = moveResult.direction;
       return MiniMaxResult(moveResult.score, bestDirection);
     } else {
-      int score = checkSystemMove(board, depth, numerics.int64MaxValue, points);
+      int score = await checkSystemMove(board, depth, numerics.int64MaxValue, points);
       return MiniMaxResult(score, bestDirection);
     }
   }
 
-  PlayerMoveResult checkPlayerMoves(Board board, int depth, int startScore) {
+  Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, int startScore) async {
     MoveDirection bestDirection = MoveDirection.left;
     int bestScore = startScore;
 
@@ -51,7 +55,7 @@ class MiniMax {
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
-      MiniMaxResult nextResult = minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system, mergedBoard.points);
+      MiniMaxResult nextResult = await minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system, mergedBoard.points);
       int nextScore = nextResult.score;
 
       if (nextScore > bestScore) {
@@ -63,7 +67,7 @@ class MiniMax {
     return PlayerMoveResult(bestScore, bestDirection);
   }
 
-  int checkSystemMove(Board board, int depth, int startScore, int points) {
+  Future<int> checkSystemMove(Board board, int depth, int startScore, int points) async {
     int bestScore = startScore;
 
     List<Position> emptyTiles = _getEmptyPositions(board);
@@ -76,7 +80,7 @@ class MiniMax {
     for (final position in emptyTiles) {
       for (final possibleValue in possibleValues) {
         final newBoard = _tileAdder.addTile(board, position.intX, position.intY, possibleValue);
-        MiniMaxResult nextResult = minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
+        MiniMaxResult nextResult = await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
         int nextScore = nextResult.score;
 
         if (nextScore < bestScore) {
@@ -86,20 +90,6 @@ class MiniMax {
     }
 
     return bestScore;
-  }
-
-  int calculateScore(Board board, int points) {
-    final lessValuesScore = board.array.items.values.length;
-    final allValues = board.array.items.values.map((e) => e.tiles[0].value).toList();
-    allValues.sort((a, b) => b.compareTo(a));
-    final highestValue = allValues.first;
-    final secondHighestValue = allValues[1];
-    final twos = board.array.items.values.map((e) => e.tiles[0].value).where((e) => e == 2 || e == 4).toList().length;
-    final isInCornerH1 = board.array.get(3, 3)?.tiles[0].value == highestValue;
-    final isInCornerH2 = board.array.get(3, 2)?.tiles[0].value == secondHighestValue;
-    final inCornerScore = (isInCornerH1 ? 2 : 0) + (isInCornerH2 ? 1 : 0);
-
-    return -lessValuesScore - twos + inCornerScore;
   }
 
   bool isMoveLegal(Board board, MoveDirection moveDirection) {
