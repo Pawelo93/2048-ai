@@ -1,7 +1,10 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/ai/ai_manager.dart';
+import 'package:game_2048/ai/test_isolates.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/game/game_bloc.dart';
@@ -135,11 +138,13 @@ class GameView extends StatelessWidget {
   }
 
   void moveAi(BuildContext context) async {
+
+    TestIsolates().test();
+    return;
+
     if (lock) {
       return;
     }
-
-    await Future.delayed(Duration(milliseconds: 1));
 
     final currentState = context.read<GameBloc>().state;
 
