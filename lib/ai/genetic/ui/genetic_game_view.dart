@@ -3,11 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/ai/ai_manager.dart';
 import 'package:game_2048/ai/genetic/ui/genetic_bloc.dart';
 import 'package:game_2048/ai/genetic/genetic_manager.dart';
-import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/game/game_bloc.dart';
-import 'package:game_2048/ui/board_view.dart';
 import 'package:game_2048/ui/no_animation_board_view.dart';
-import 'package:game_2048/ui/ui_item.dart';
 
 class GeneticGameView extends StatefulWidget {
   GeneticGameView({Key? key}) : super(key: key);
@@ -56,7 +53,6 @@ class _GeneticGameViewState extends State<GeneticGameView> {
               if (state.waitingGameType == WaitingGameType.gameOver) {
                 context.read<GeneticBloc>().end(score);
                 score = 0;
-                // context.read<ScoreBloc>().updateBestScore();
               }
             }
           },
@@ -93,7 +89,6 @@ class _GeneticGameViewState extends State<GeneticGameView> {
     if (currentState is PlayingGameState) {
       // TODO load best weight
       final aiMove = await aiManager.findBestMove(currentState.board, scoreWeights);
-      print('AI MOVE ${aiMove}');
       final newCurrentState = context.read<GameBloc>().state;
       if (aiMove == null) {
         print('CANNOT MOVE !!!!');

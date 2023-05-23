@@ -1,5 +1,6 @@
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_manager.dart';
+import 'package:game_2048/board/board_tile_merger.dart';
 import 'package:game_2048/game/game_bloc.dart';
 
 class BoardMover {

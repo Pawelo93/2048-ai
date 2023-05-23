@@ -33,6 +33,7 @@ class MiniMax {
     int points,
   ) async {
     MoveDirection? bestDirection = null;
+    double bestScore = 0;
 
     if (depth == 0) {
       final score = _scoreCalculator.calculate(board, points);
@@ -42,11 +43,13 @@ class MiniMax {
     if (maximizingPlayer == MaximizingPlayer.player) {
       final moveResult = await checkPlayerMoves(board, depth, -double.infinity);
       bestDirection = moveResult.direction;
-      return MiniMaxResult(moveResult.score, bestDirection);
+      bestScore = moveResult.score;
+      print('BEST DIRECTION ${moveResult.direction} score ${moveResult.score}');
     } else {
-      double score = await checkSystemMove(board, depth, double.infinity, points);
-      return MiniMaxResult(score, bestDirection);
+      bestScore = await checkSystemMove(board, depth, double.infinity, points);
     }
+
+    return MiniMaxResult(bestScore, bestDirection);
   }
 
   Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, double startScore) async {
@@ -54,10 +57,10 @@ class MiniMax {
     double bestScore = startScore;
 
     for (final direction in MoveDirection.values) {
-      if (!isMoveLegal(board, direction)) {
-        print('DIR $direction   depth $depth');
+      if (!_boardMover.isMoveValid(board, direction)) {
         continue;
       }
+      print('DIR $direction   depth $depth   bestScore $bestScore');
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
@@ -67,9 +70,7 @@ class MiniMax {
       if (nextScore > bestScore) {
         bestScore = nextScore;
         bestDirection = direction;
-        print('BEST DIR  ${direction}  BUT IS IT LEGAL??? ${isMoveLegal(board, direction)}  depth $depth');
       }
-      print('NOT BEST DIR ${direction}   BUT IS IT LEGAL??? ${isMoveLegal(board, direction)} depth $depth');
     }
 
     return PlayerMoveResult(bestScore, bestDirection);
@@ -98,11 +99,6 @@ class MiniMax {
     }
 
     return bestScore;
-  }
-
-  bool isMoveLegal(Board board, MoveDirection moveDirection) {
-    final newBoard = _boardMover.move(board, moveDirection);
-    return newBoard != board;
   }
 
   List<Position> _getEmptyPositions(Board board) {
