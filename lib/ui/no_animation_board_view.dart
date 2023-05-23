@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/tile/positioned_tile.dart';
-import 'package:game_2048/game/game_bloc.dart';
 import 'package:game_2048/board/util/position.dart';
 
-class BoardWidget extends StatelessWidget {
-  const BoardWidget({Key? key, required this.positionedTiles}) : super(key: key);
+class NoAnimationBoardWidget extends StatelessWidget {
+  const NoAnimationBoardWidget({Key? key, required this.positionedTiles}) : super(key: key);
 
   final List<PositionedTile> positionedTiles;
 
@@ -14,12 +12,15 @@ class BoardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final boardWidth = MediaQuery.of(context).size.width / 2;
 
-    return BoardView(positionedTiles: positionedTiles, boardWidth: boardWidth,);
+    return NoAnimationBoardView(
+      positionedTiles: positionedTiles,
+      boardWidth: boardWidth,
+    );
   }
 }
 
-class BoardView extends StatelessWidget {
-  const BoardView({
+class NoAnimationBoardView extends StatelessWidget {
+  const NoAnimationBoardView({
     Key? key,
     required this.positionedTiles,
     required this.boardWidth,
@@ -39,7 +40,7 @@ class BoardView extends StatelessWidget {
 
     final boardHeight = boardWidth;
 
-    const gap = 12.0;
+    const gap = 8.0;
     final width = (boardWidth - 5 * gap) / 4;
     final height = width;
 
@@ -68,14 +69,10 @@ class BoardView extends StatelessWidget {
             );
           }),
           ...positionedTiles.where((tile) => tile.value > 0).map((item) {
-            return AnimatedPositioned(
+            return Positioned(
               key: ValueKey(item.id),
-              duration: const Duration(milliseconds: animationSpeed),
               left: item.position.x * (width + gap),
               top: item.position.y * (height + gap),
-              onEnd: () {
-                context.read<GameBloc>().animationEnd();
-              },
               child: TileItem(
                 tile: item,
                 width: width,
@@ -89,7 +86,7 @@ class BoardView extends StatelessWidget {
   }
 }
 
-class TileItem extends StatefulWidget {
+class TileItem extends StatelessWidget {
   const TileItem({
     Key? key,
     required this.tile,
@@ -102,45 +99,21 @@ class TileItem extends StatefulWidget {
   final double height;
 
   @override
-  State<TileItem> createState() => _TileItemState();
-}
-
-class _TileItemState extends State<TileItem>
-    with SingleTickerProviderStateMixin {
-  final Tween<double> _tween = Tween(begin: 0.6, end: 1.0);
-  late AnimationController _animationController;
-  late CurvedAnimation _curvedAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: animationSpeed),
-    );
-    _curvedAnimation = CurvedAnimation(parent: _animationController, curve: Curves.bounceInOut);
-    _animationController.forward();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _tween.animate(_curvedAnimation),
-      child: Container(
-        width: widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: getItemColor(widget.tile.value),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Center(
-          child: Text(
-            widget.tile.value.toString(),
-            style: TextStyle(
-              color: AppColors.tileTextColor,
-              fontSize: getSize(widget.tile.value),
-              fontWeight: FontWeight.bold,
-            ),
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: getItemColor(tile.value),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Text(
+          tile.value.toString(),
+          style: TextStyle(
+            color: AppColors.tileTextColor,
+            fontSize: getSize(tile.value),
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -178,13 +151,13 @@ class _TileItemState extends State<TileItem>
 
   double getSize(int value) {
     if (value < 100) {
-      return 40;
-    } else if (value < 1000) {
-      return 30;
-    } else if (value < 10000) {
       return 20;
-    } else {
+    } else if (value < 1000) {
       return 14;
+    } else if (value < 10000) {
+      return 10;
+    } else {
+      return 7;
     }
   }
 }

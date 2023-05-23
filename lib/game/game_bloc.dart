@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_manager.dart';
@@ -33,31 +34,36 @@ enum MoveDirection {
 
 abstract class GameState extends Equatable {}
 
+abstract class HasBoardState extends GameState {
+  final Board board;
+
+  HasBoardState({required this.board});
+}
+
 class InitialGameState extends GameState {
   @override
   List<Object?> get props => [];
 }
 
-class WaitingGameState extends GameState {
-  final Board board;
+class WaitingGameState extends HasBoardState {
   final WaitingGameType waitingGameType;
 
   WaitingGameState({
-    required this.board,
+    required super.board,
     required this.waitingGameType,
   });
 
   @override
   List<Object?> get props => [board, waitingGameType];
+
 }
 
-class PlayingGameState extends GameState {
-  final Board board;
+class PlayingGameState extends HasBoardState {
   final MovingActor movingActor;
   final int addToScore;
 
   PlayingGameState({
-    required this.board,
+    required super.board,
     required this.movingActor,
     this.addToScore = 0,
   });
@@ -129,7 +135,7 @@ class GameBloc extends Cubit<GameState> {
       final boardWithNewTile = _boardManager.addRandomTile(currentState.board);
 
       final isGameOver = checkIfGameOver(boardWithNewTile);
-
+      print('IS GAME OVER ??? $isGameOver   ---- ${boardWithNewTile.array.items.length}');
       if (isGameOver) {
         emit(WaitingGameState(
           board: boardWithNewTile,
@@ -149,5 +155,13 @@ class GameBloc extends Cubit<GameState> {
         board == _boardMover.move(board, MoveDirection.right) &&
         board == _boardMover.move(board, MoveDirection.up) &&
         board == _boardMover.move(board, MoveDirection.down);
+  }
+
+  void stop() {
+    final currentState = state;
+    if (currentState is PlayingGameState) {
+      print('STOP');
+      emit(WaitingGameState(board: currentState.board, waitingGameType: WaitingGameType.beforeStart));
+    }
   }
 }

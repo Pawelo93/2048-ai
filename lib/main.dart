@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_2048/ai/genetic/ui/genetic_widget.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/game_mode.dart';
 import 'package:game_2048/ui/home_page_ui.dart';
@@ -40,7 +41,8 @@ class _MyHomePageState extends State<MyHomePage>
       color: AppColors.appBackground,
       child: Column(
         children: [
-          HomePageUi(),
+          GeneticWidget(),
+          // HomePageUi(),
         ],
       ),
     );

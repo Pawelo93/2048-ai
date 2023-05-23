@@ -2,6 +2,7 @@ import 'dart:isolate';
 
 import 'package:dart_numerics/dart_numerics.dart' as numerics;
 import 'package:equatable/equatable.dart';
+import 'package:game_2048/ai/genetic/genetic_manager.dart';
 import 'package:game_2048/ai/score_calculator.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_mover.dart';
@@ -21,13 +22,17 @@ class MiniMax {
   final BoardTileMerger _boardTileMerger = BoardTileMerger();
   final ScoreCalculator _scoreCalculator = ScoreCalculator();
 
+  void setupWeights(ScoreWeights weights) {
+    _scoreCalculator.setupWeights(weights);
+  }
+
   Future<MiniMaxResult> minimax(
     Board board,
     int depth,
     MaximizingPlayer maximizingPlayer,
     int points,
   ) async {
-    MoveDirection bestDirection = MoveDirection.left;
+    MoveDirection? bestDirection = null;
 
     if (depth == 0) {
       final score = _scoreCalculator.calculate(board, points);
@@ -35,40 +40,43 @@ class MiniMax {
     }
 
     if (maximizingPlayer == MaximizingPlayer.player) {
-      final moveResult = await checkPlayerMoves(board, depth, -9999999);
+      final moveResult = await checkPlayerMoves(board, depth, -double.infinity);
       bestDirection = moveResult.direction;
       return MiniMaxResult(moveResult.score, bestDirection);
     } else {
-      int score = await checkSystemMove(board, depth, numerics.int64MaxValue, points);
+      double score = await checkSystemMove(board, depth, double.infinity, points);
       return MiniMaxResult(score, bestDirection);
     }
   }
 
-  Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, int startScore) async {
-    MoveDirection bestDirection = MoveDirection.left;
-    int bestScore = startScore;
+  Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, double startScore) async {
+    MoveDirection? bestDirection = null;
+    double bestScore = startScore;
 
     for (final direction in MoveDirection.values) {
       if (!isMoveLegal(board, direction)) {
+        print('DIR $direction   depth $depth');
         continue;
       }
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
       MiniMaxResult nextResult = await minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system, mergedBoard.points);
-      int nextScore = nextResult.score;
+      double nextScore = nextResult.score;
 
       if (nextScore > bestScore) {
         bestScore = nextScore;
         bestDirection = direction;
+        print('BEST DIR  ${direction}  BUT IS IT LEGAL??? ${isMoveLegal(board, direction)}  depth $depth');
       }
+      print('NOT BEST DIR ${direction}   BUT IS IT LEGAL??? ${isMoveLegal(board, direction)} depth $depth');
     }
 
     return PlayerMoveResult(bestScore, bestDirection);
   }
 
-  Future<int> checkSystemMove(Board board, int depth, int startScore, int points) async {
-    int bestScore = startScore;
+  Future<double> checkSystemMove(Board board, int depth, double startScore, int points) async {
+    double bestScore = startScore;
 
     List<Position> emptyTiles = _getEmptyPositions(board);
     if (emptyTiles.isEmpty) {
@@ -81,7 +89,7 @@ class MiniMax {
       for (final possibleValue in possibleValues) {
         final newBoard = _tileAdder.addTile(board, position.intX, position.intY, possibleValue);
         MiniMaxResult nextResult = await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
-        int nextScore = nextResult.score;
+        double nextScore = nextResult.score;
 
         if (nextScore < bestScore) {
           bestScore = nextScore;
@@ -111,8 +119,8 @@ class MiniMax {
 }
 
 class MiniMaxResult extends Equatable {
-  final int score;
-  final MoveDirection direction;
+  final double score;
+  final MoveDirection? direction;
 
   const MiniMaxResult(this.score, this.direction);
 
@@ -121,8 +129,8 @@ class MiniMaxResult extends Equatable {
 }
 
 class PlayerMoveResult extends Equatable {
-  final int score;
-  final MoveDirection direction;
+  final double score;
+  final MoveDirection? direction;
 
   const PlayerMoveResult(this.score, this.direction);
 

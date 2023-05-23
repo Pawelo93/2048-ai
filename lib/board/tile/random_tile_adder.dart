@@ -5,7 +5,7 @@ import 'package:game_2048/board/tile/tile_adder.dart';
 import 'package:game_2048/board/util/position.dart';
 
 class RandomTileAdder {
-  final Random random = Random(1);
+  final Random random = Random();
   final TileAdder _tileAdder = TileAdder();
 
   Board addRandom(Board board) {

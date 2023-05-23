@@ -40,10 +40,16 @@ dependencies:
   uuid: ^3.0.7
   shared_preferences: ^2.1.1
   dart_numerics: ^0.0.6
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  isar_generator: ^3.1.0+1
+  build_runner:
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
