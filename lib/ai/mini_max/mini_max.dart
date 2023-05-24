@@ -32,7 +32,7 @@ class MiniMax {
     MaximizingPlayer maximizingPlayer,
     int points,
   ) async {
-    MoveDirection? bestDirection = null;
+    MoveDirection? bestDirection;
     double bestScore = 0;
 
     if (depth == 0) {
@@ -44,7 +44,6 @@ class MiniMax {
       final moveResult = await checkPlayerMoves(board, depth, -double.infinity);
       bestDirection = moveResult.direction;
       bestScore = moveResult.score;
-      print('BEST DIRECTION ${moveResult.direction} score ${moveResult.score}');
     } else {
       bestScore = await checkSystemMove(board, depth, double.infinity, points);
     }
@@ -53,14 +52,18 @@ class MiniMax {
   }
 
   Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, double startScore) async {
-    MoveDirection? bestDirection = null;
+    MoveDirection? bestDirection;
     double bestScore = startScore;
+
+    if (isGameTerminated(board)) {
+      bestScore = 0;
+      return PlayerMoveResult(bestScore, bestDirection);
+    }
 
     for (final direction in MoveDirection.values) {
       if (!_boardMover.isMoveValid(board, direction)) {
         continue;
       }
-      print('DIR $direction   depth $depth   bestScore $bestScore');
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
@@ -76,7 +79,18 @@ class MiniMax {
     return PlayerMoveResult(bestScore, bestDirection);
   }
 
-  Future<double> checkSystemMove(Board board, int depth, double startScore, int points) async {
+  bool isGameTerminated(Board board) {
+    for (MoveDirection direction in MoveDirection.values) {
+      final isValid = _boardMover.isMoveValid(board, direction);
+      if (isValid) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<double> checkSystemMove(
+      Board board, int depth, double startScore, int points,) async {
     double bestScore = startScore;
 
     List<Position> emptyTiles = _getEmptyPositions(board);
@@ -88,8 +102,10 @@ class MiniMax {
 
     for (final position in emptyTiles) {
       for (final possibleValue in possibleValues) {
-        final newBoard = _tileAdder.addTile(board, position.intX, position.intY, possibleValue);
-        MiniMaxResult nextResult = await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
+        final newBoard = _tileAdder.addTile(
+            board, position.intX, position.intY, possibleValue);
+        MiniMaxResult nextResult =
+            await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
         double nextScore = nextResult.score;
 
         if (nextScore < bestScore) {

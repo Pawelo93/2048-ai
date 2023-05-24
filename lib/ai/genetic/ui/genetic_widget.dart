@@ -30,6 +30,7 @@ class GeneticWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: RunAiButton(
                   onClick: () {
+                    print('START');
                     final bloc = context.read<GameBloc>();
                     if(bloc.state is PlayingGameState) {
                       bloc.stop();

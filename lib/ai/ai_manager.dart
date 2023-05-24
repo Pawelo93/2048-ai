@@ -23,7 +23,7 @@ class AiManager {
     bool blocking = true;
     MiniMaxResult result;
     if (blocking) {
-      if (step > 0) {
+      if (step > 50) {
         await Future.delayed(Duration(milliseconds: 5));
         step = 0;
       }

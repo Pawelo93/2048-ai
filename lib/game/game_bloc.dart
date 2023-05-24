@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/board/board_manager.dart';
 import 'package:game_2048/board/tile/multi_tile.dart';
+import 'package:game_2048/board/tile/random_tile_adder.dart';
 import 'package:game_2048/board/tile/tile.dart';
 import 'package:game_2048/board/board_mover.dart';
 import 'package:game_2048/board/util/two_dimens_array.dart';
@@ -75,41 +76,22 @@ class PlayingGameState extends HasBoardState {
 class GameBloc extends Cubit<GameState> {
   final BoardMover _boardMover = BoardMover();
   final BoardManager _boardManager = BoardManager();
+  final RandomTileAdder _randomTileAdder = RandomTileAdder();
 
   GameBloc() : super(InitialGameState());
 
   void startGame() {
     final TwoDimensArray twoDimensArrayMultiTile = TwoDimensArray(HashMap());
+
     // twoDimensArrayMultiTile.put(1, 2, MultiTile.single(const Tile('1', 2)));
     // twoDimensArrayMultiTile.put(2, 3, MultiTile.single(const Tile('3', 8)));
-    // twoDimensArrayMultiTile.put(1, 0, MultiTile.single(const Tile('2', 4)));
-    // twoDimensArrayMultiTile.put(1, 0, MultiTile.single(const Tile('4', 2)));
 
-
-    twoDimensArrayMultiTile.put(0, 0, MultiTile.single(const Tile('1', 2)));
-    twoDimensArrayMultiTile.put(0, 1, MultiTile.single(const Tile('2', 2)));
-    twoDimensArrayMultiTile.put(0, 2, MultiTile.single(const Tile('3', 2)));
-    twoDimensArrayMultiTile.put(0, 3, MultiTile.single(const Tile('4', 2)));
-
-    twoDimensArrayMultiTile.put(1, 0, MultiTile.single(const Tile('5', 4)));
-    twoDimensArrayMultiTile.put(1, 1, MultiTile.single(const Tile('6', 4)));
-    twoDimensArrayMultiTile.put(1, 2, MultiTile.single(const Tile('7', 4)));
-    twoDimensArrayMultiTile.put(1, 3, MultiTile.single(const Tile('8', 4)));
-
-    twoDimensArrayMultiTile.put(2, 0, MultiTile.single(const Tile('9', 2)));
-    twoDimensArrayMultiTile.put(2, 1, MultiTile.single(const Tile('10', 2)));
-    twoDimensArrayMultiTile.put(2, 2, MultiTile.single(const Tile('11', 2)));
-    twoDimensArrayMultiTile.put(2, 3, MultiTile.single(const Tile('12', 2)));
-
-    twoDimensArrayMultiTile.put(3, 0, MultiTile.single(const Tile('13', 4)));
-    twoDimensArrayMultiTile.put(3, 1, MultiTile.single(const Tile('14', 4)));
-    twoDimensArrayMultiTile.put(3, 2, MultiTile.single(const Tile('15', 4)));
-    twoDimensArrayMultiTile.put(3, 3, MultiTile.single(const Tile('16', 4)));
-
-    final initialBoard = Board(twoDimensArrayMultiTile);
+    final cleanBoard = Board(twoDimensArrayMultiTile);
+    final boardWithOneRandom = _randomTileAdder.addRandom(cleanBoard);
+    final boardWithTwoRandom = _randomTileAdder.addRandom(boardWithOneRandom);
 
     emit(PlayingGameState(
-      board: initialBoard,
+      board: boardWithTwoRandom,
       movingActor: MovingActor.player,
     ));
   }

@@ -8,7 +8,7 @@ typedef PlayGameContract = Future<double> Function(ScoreWeights weights);
 
 class GeneticManager {
   int generation = 0;
-  int totalPopulation = 150;
+  int totalPopulation = 100;
 
   final Random random = Random();
   late PlayGameContract playGameContract;

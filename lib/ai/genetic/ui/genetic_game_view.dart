@@ -32,7 +32,7 @@ class _GeneticGameViewState extends State<GeneticGameView> {
         final currentWeights = geneticState.currentWeights;
         return BlocConsumer<GameBloc, GameState>(
           listener: (context, state) async {
-            print('STATE $state');
+            // print('STATE $state');
 
             if (state is PlayingGameState) {
               if (state.addToScore > 0) {
