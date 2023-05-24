@@ -7,36 +7,26 @@ import 'package:game_2048/ai/mini_max/mini_max.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/game/game_bloc.dart';
 
-// TODO
-/*
-1 . DB iser [v]
-2. beta pruning [v]
-3. mutations
-4. more weights
- */
 class AiManager {
-  final MiniMax _miniMax = MiniMax();
   final AlphaBeta _alphaBeta = AlphaBeta();
 
   int step = 0;
 
   Future<MoveDirection?> findBestMove(Board board, ScoreWeights weights) async {
-    _miniMax.setupWeights(weights);
     _alphaBeta.setupWeights(weights);
 
     bool blocking = true;
     AlphaBetaResult result;
     if (blocking) {
-      if (step > 0) {
+      if (step > 20) {
         await Future.delayed(Duration(milliseconds: 5));
         step = 0;
       }
       final start = DateTime.now().millisecondsSinceEpoch;
       result = await _alphaBeta.alphaBeta(
         board,
-        5,
+        3,
         MaximizingPlayer.player,
-        0,
         -double.infinity,
         double.infinity
       );

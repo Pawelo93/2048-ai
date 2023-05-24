@@ -24,13 +24,12 @@ class MiniMax {
     Board board,
     int depth,
     MaximizingPlayer maximizingPlayer,
-    int points,
   ) async {
     MoveDirection? bestDirection;
     double bestScore = 0;
 
     if (depth == 0) {
-      final score = _scoreCalculator.calculate(board, points);
+      final score = _scoreCalculator.calculate(ScoreCalculatorModel(board));
       return MiniMaxResult(score, bestDirection);
     }
 
@@ -39,7 +38,7 @@ class MiniMax {
       bestDirection = moveResult.direction;
       bestScore = moveResult.score;
     } else {
-      bestScore = await checkSystemMove(board, depth, double.infinity, points);
+      bestScore = await checkSystemMove(board, depth, double.infinity);
     }
 
     return MiniMaxResult(bestScore, bestDirection);
@@ -61,7 +60,7 @@ class MiniMax {
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
-      MiniMaxResult nextResult = await minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system, mergedBoard.points);
+      MiniMaxResult nextResult = await minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system);
       double nextScore = nextResult.score;
 
       if (nextScore > bestScore) {
@@ -84,7 +83,7 @@ class MiniMax {
   }
 
   Future<double> checkSystemMove(
-      Board board, int depth, double startScore, int points,) async {
+      Board board, int depth, double startScore,) async {
     double bestScore = startScore;
 
     List<Position> emptyTiles = _getEmptyPositions(board);
@@ -99,7 +98,7 @@ class MiniMax {
         final newBoard = _tileAdder.addTile(
             board, position.intX, position.intY, possibleValue);
         MiniMaxResult nextResult =
-            await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
+            await minimax(newBoard, depth - 1, MaximizingPlayer.player);
         double nextScore = nextResult.score;
 
         if (nextScore < bestScore) {

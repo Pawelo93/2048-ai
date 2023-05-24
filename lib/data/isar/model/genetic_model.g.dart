@@ -423,6 +423,16 @@ const WeightsSchema = Schema(
       id: 3,
       name: r'w2',
       type: IsarType.double,
+    ),
+    r'w3': PropertySchema(
+      id: 4,
+      name: r'w3',
+      type: IsarType.double,
+    ),
+    r'w4': PropertySchema(
+      id: 5,
+      name: r'w4',
+      type: IsarType.double,
     )
   },
   estimateSize: _weightsEstimateSize,
@@ -450,6 +460,8 @@ void _weightsSerialize(
   writer.writeLong(offsets[1], object.score);
   writer.writeDouble(offsets[2], object.w1);
   writer.writeDouble(offsets[3], object.w2);
+  writer.writeDouble(offsets[4], object.w3);
+  writer.writeDouble(offsets[5], object.w4);
 }
 
 Weights _weightsDeserialize(
@@ -463,6 +475,8 @@ Weights _weightsDeserialize(
     score: reader.readLongOrNull(offsets[1]),
     w1: reader.readDoubleOrNull(offsets[2]),
     w2: reader.readDoubleOrNull(offsets[3]),
+    w3: reader.readDoubleOrNull(offsets[4]),
+    w4: reader.readDoubleOrNull(offsets[5]),
   );
   return object;
 }
@@ -481,6 +495,10 @@ P _weightsDeserializeProp<P>(
     case 2:
       return (reader.readDoubleOrNull(offset)) as P;
     case 3:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 4:
+      return (reader.readDoubleOrNull(offset)) as P;
+    case 5:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -774,6 +792,162 @@ extension WeightsQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'w2',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3IsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'w3',
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3IsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'w3',
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3EqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'w3',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3GreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'w3',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3LessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'w3',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w3Between(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'w3',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4IsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'w4',
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4IsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'w4',
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4EqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'w4',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4GreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'w4',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4LessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'w4',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Weights, Weights, QAfterFilterCondition> w4Between(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'w4',
         lower: lower,
         includeLower: includeLower,
         upper: upper,

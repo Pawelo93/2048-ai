@@ -8,7 +8,8 @@ typedef PlayGameContract = Future<double> Function(ScoreWeights weights);
 
 class GeneticManager {
   int generation = 0;
-  int totalPopulation = 100;
+  int totalPopulation = 20;
+  double mutationRate = 0.15;
 
   final Random random = Random();
   late PlayGameContract playGameContract;
@@ -25,8 +26,10 @@ class GeneticManager {
     for (int i = 0; i < totalPopulation; i++) {
       startGeneration.add(
         ScoreWeights(
-          w1: Weight(random.nextDouble()),
-          w2: Weight(random.nextDouble()),
+          newPoints: Weight(random.nextDouble()),
+          merging: Weight(random.nextDouble()),
+          emptyTiles: Weight(random.nextDouble()),
+          clustering: Weight(random.nextDouble()),
         ),
       );
     }
@@ -51,33 +54,34 @@ class GeneticManager {
     isarDatabase.add(
       id,
       Weights(
-        w1: best.weights.w1.value,
-        w2: best.weights.w2.value,
+        w1: best.weights.newPoints.value,
+        w2: best.weights.merging.value,
+        w3: best.weights.emptyTiles.value,
+        w4: best.weights.clustering.value,
         generation: generation,
         score: bscore,
       ),
     );
-    print(
-        'BEST SCORE ${bscore} generation ${generation} currentBestScore (${currentBestScore})');
+    print('');
+    print('BEST SCORE ${bscore} generation ${generation} (BS ${currentBestScore})');
+    showWeights(best.weights);
+    print('');
 
     final nextGeneration = reproduction(fitnessElements);
 
     return nextGeneration;
   }
 
+  void showWeights(ScoreWeights weights) {
+    print('== NewPoints: ${weights.newPoints.value.toStringAsFixed(2)} ');
+    print('== Merging: ${weights.merging.value.toStringAsFixed(2)} ');
+    print('== EmptyTiles: ${weights.emptyTiles.value.toStringAsFixed(2)} ');
+    print('== Clustering: ${weights.clustering.value.toStringAsFixed(2)} ');
+  }
+
   int bestScore(List<FitnessElement> generation) {
     return generation.map((element) => element.fitness).reduce(max);
   }
-
-  // Future<List<FitnessElement>> calculateFitness(List<ScoreWeights> scoreWeights) async {
-  //   final List<FitnessElement> fitnessElements = [];
-  //   for (final weights in scoreWeights) {
-  //     final gameScore = await playGameContract(weights);
-  //     fitnessElements.add(FitnessElement(weights, gameScore));
-  //   }
-  //
-  //   return fitnessElements;
-  // }
 
   List<ScoreWeights> reproduction(List<FitnessElement> fitnessElements) {
     final List<FitnessElement> listOfWeights = [];
@@ -113,17 +117,70 @@ class GeneticManager {
       i++;
     } while (first == second && i < listOfWeights.length);
 
-    final rand = random.nextBool();
-    final newW1 = rand ? first.weights.w1 : second.weights.w1;
-    final newW2 = rand ? second.weights.w2 : first.weights.w2;
-    // final newW1 = (first.w1.value + second.w1.value) / 2;
-    // final newW2 = (first.w2.value + second.w2.value) / 2;
-    final newWeights = ScoreWeights(w1: newW1, w2: newW2);
+    final rand1 = random.nextBool();
+    final rand2 = random.nextBool();
+    final newNewPoints =
+        rand1 ? first.weights.newPoints : second.weights.newPoints;
+    final newMerging = rand1 ? second.weights.merging : first.weights.merging;
+    final newEmptyTiles =
+        rand2 ? first.weights.emptyTiles : second.weights.emptyTiles;
+    final newClustering =
+        rand2 ? second.weights.clustering : first.weights.clustering;
 
-    // TODO MUTATION
-    // newItem = doMutation(random, newItem)
+    ScoreWeights newWeights = ScoreWeights(
+      newPoints: newNewPoints,
+      merging: newMerging,
+      emptyTiles: newEmptyTiles,
+      clustering: newClustering,
+    );
+
+    if (random.nextDouble() < mutationRate) {
+      newWeights = mutate(newWeights);
+    }
 
     return newWeights;
+  }
+
+  ScoreWeights mutate(ScoreWeights scoreWeights) {
+    final addOrSubtractMutation1 = random.nextBool();
+    final addOrSubtractMutation2 = random.nextBool();
+    final mutationW1 = random.nextDouble() * 0.1;
+    final mutationW2 = random.nextDouble() * 0.1;
+    final mutationW3 = random.nextDouble() * 0.1;
+    final mutationW4 = random.nextDouble() * 0.1;
+
+    double newPointsMutated = addOrSubtractMutation1
+        ? scoreWeights.newPoints.value + mutationW1
+        : scoreWeights.newPoints.value - mutationW1;
+    double mergingMutated = addOrSubtractMutation2
+        ? scoreWeights.merging.value + mutationW2
+        : scoreWeights.merging.value - mutationW2;
+    double emptyTilesMutated = addOrSubtractMutation2
+        ? scoreWeights.emptyTiles.value + mutationW3
+        : scoreWeights.emptyTiles.value - mutationW3;
+    double clusteringMutated = addOrSubtractMutation2
+        ? scoreWeights.clustering.value + mutationW4
+        : scoreWeights.clustering.value - mutationW4;
+
+    final afterMutation = ScoreWeights(
+      newPoints: Weight(normalized(newPointsMutated)),
+      merging: Weight(normalized(mergingMutated)),
+      emptyTiles: Weight(normalized(emptyTilesMutated)),
+      clustering: Weight(normalized(clusteringMutated)),
+    );
+    // print('WEIGHTS BEFORE MUTATION $scoreWeights   --- after $afterMutation');
+
+    return afterMutation;
+  }
+
+  double normalized(double value) {
+    if (value > 1) {
+      return 1;
+    } else if (value < 0) {
+      return 0;
+    }
+
+    return value;
   }
 
   T randomChoice<T>(Iterable<T> options,
@@ -157,16 +214,20 @@ class GeneticManager {
 }
 
 class ScoreWeights extends Equatable {
-  final Weight w1;
-  final Weight w2;
+  final Weight newPoints;
+  final Weight merging;
+  final Weight emptyTiles;
+  final Weight clustering;
 
   const ScoreWeights({
-    required this.w1,
-    required this.w2,
+    required this.newPoints,
+    required this.merging,
+    required this.emptyTiles,
+    required this.clustering,
   });
 
   @override
-  List<Object?> get props => [w1];
+  List<Object?> get props => [newPoints, merging, emptyTiles, clustering];
 }
 
 class Weight extends Equatable {

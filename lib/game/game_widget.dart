@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_2048/ai/ai_manager.dart';
+import 'package:game_2048/ai/genetic/genetic_manager.dart';
 import 'package:game_2048/app_colors.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/game/game_bloc.dart';
@@ -143,9 +144,19 @@ class GameView extends StatelessWidget {
 
     if (currentState is PlayingGameState) {
       // TODO FIX WEIGHT
-      // final aiMove = await aiManager.findBestMove(currentState.board, ScoreWeights(w1: Weight(0.0)));
-      // context.read<GameBloc>().move(aiMove);
-      // context.read<GameBloc>().animationEnd();
+      final aiMove = await aiManager.findBestMove(
+        currentState.board,
+        const ScoreWeights(
+          newPoints: Weight(0.18),
+          merging: Weight(0.47),
+          emptyTiles: Weight(0.30),
+          clustering: Weight(0.19),
+        ),
+      );
+      if (aiMove != null) {
+        context.read<GameBloc>().move(aiMove);
+        context.read<GameBloc>().animationEnd();
+      }
 
       if (stepper) {
         lock = true;

@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:game_2048/ai/genetic/genetic_manager.dart';
 import 'package:game_2048/board/board.dart';
 
@@ -8,22 +9,65 @@ class ScoreCalculator {
     this.weights = weights;
   }
 
-  double calculate(Board board, int points) {
-    final lessValuesScore = board.array.items.values.length;
-    final twos = board.array.items.values.map((e) => e.tiles[0].value).where((e) => e == 2 || e == 4).toList().length;
+  double calculate(ScoreCalculatorModel model) {
+    final double points = model.board.getScore() / 15000;
+    final emptyTiles = 16 - model.board.array.items.values.length;
+    final int notMerged = model.board.array.items.values
+        .where((element) => !element.isSingle)
+        .length;
+    final clustering = calculateClustering(model.board);
 
-    return twos * weights.w1.value - lessValuesScore * weights.w2.value;
+    return points * weights.newPoints.value -
+        notMerged * weights.merging.value +
+        emptyTiles * weights.emptyTiles.value +
+        clustering * weights.clustering.value;
+  }
 
-    // allValues.sort((a, b) => b.compareTo(a));
-    // final highestValue = allValues.first;
-    // final secondHighestValue = allValues[1];
-    // final twos = board.array.items.values.map((e) => e.tiles[0].value).where((e) => e == 2 || e == 4).toList().length;
-    // final isInCornerH1 = board.array.get(3, 3)?.tiles[0].value == highestValue;
-    // final isInCornerH2 = board.array.get(3, 2)?.tiles[0].value == secondHighestValue;
-    // final inCornerScore = (isInCornerH1 ? 2 : 0) + (isInCornerH2 ? 1 : 0);
-    //
-    // return -lessValuesScore - twos + inCornerScore;
+  double calculateClustering(Board board) {
+    int clusteringScore = 0;
+
+    List<int> neighbors = [-1, 0, 1];
+
+    for (var y = 0; y < 4; y++) {
+      for (var x = 0; x < 4; x++) {
+        final item = board.array.get(x, y)?.firstOrNull;
+        if (item != null) {
+          int numOfNeighbors = 0;
+          int sum = 0;
+          for (int xN in neighbors) {
+            int sx = y + xN;
+            if (sx < 0 || sx >= 4) {
+              continue;
+            }
+            for (int yN in neighbors) {
+              int sy = x + yN;
+              if (sy < 0 || sy >= 4) {
+                continue;
+              }
+
+              final v = board.array.get(sx, sy)?.firstOrNull?.value;
+              if (v != null && v > 0) {
+                ++numOfNeighbors;
+                sum += (item.value - v).abs();
+              }
+            }
+          }
+
+          if (numOfNeighbors > 0) {
+            clusteringScore += sum ~/ numOfNeighbors;
+          }
+        }
+      }
+    }
+    return 1 / (clusteringScore + 1);
   }
 }
 
-// TODO WEIGHTS SHOULD BE HERE DEFINED AND GENETIC SHOULD USE ABSTRACTION
+class ScoreCalculatorModel extends Equatable {
+  final Board board;
+
+  const ScoreCalculatorModel(this.board);
+
+  @override
+  List<Object?> get props => [board];
+}

@@ -41,8 +41,8 @@ class _MyHomePageState extends State<MyHomePage>
       color: AppColors.appBackground,
       child: Column(
         children: [
-          GeneticWidget(),
-          // HomePageUi(),
+          // GeneticWidget(),
+          HomePageUi(),
         ],
       ),
     );

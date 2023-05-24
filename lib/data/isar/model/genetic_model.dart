@@ -14,8 +14,10 @@ class GeneticModel {
 class Weights {
   double? w1;
   double? w2;
+  double? w3;
+  double? w4;
   int? generation;
   int? score;
 
-  Weights({this.w1, this.w2, this.generation, this.score});
+  Weights({this.w1, this.w2, this.w3, this.w4, this.generation, this.score});
 }

@@ -23,27 +23,24 @@ class AlphaBeta {
     Board board,
     int depth,
     MaximizingPlayer maximizingPlayer,
-    int points,
     double alpha,
     double beta,
   ) async {
-    MoveDirection? bestDirection;
-    double bestScore = 0;
-
     if (depth == 0) {
-      final score = _scoreCalculator.calculate(board, points);
-      return AlphaBetaResult(score, bestDirection);
+      final score = _scoreCalculator.calculate(ScoreCalculatorModel(board));
+      return AlphaBetaResult(score, null);
     }
 
     if (maximizingPlayer == MaximizingPlayer.player) {
       final moveResult = await checkPlayerMoves(board, depth, alpha, beta);
-      bestDirection = moveResult.direction;
-      bestScore = moveResult.score;
+
+      return AlphaBetaResult(moveResult.score, moveResult.direction);
     } else {
-      bestScore = await checkSystemMove(board, depth, points, alpha, beta);
+      final bestScore = await checkSystemMove(board, depth, alpha, beta);
+
+      return AlphaBetaResult(bestScore, null);
     }
 
-    return AlphaBetaResult(bestScore, bestDirection);
   }
 
   Future<PlayerMoveResult> checkPlayerMoves(
@@ -66,11 +63,11 @@ class AlphaBeta {
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
+
       AlphaBetaResult nextResult = await alphaBeta(
         mergedBoard.board,
         depth - 1,
         MaximizingPlayer.system,
-        mergedBoard.points,
         alpha,
         beta,
       );
@@ -91,12 +88,9 @@ class AlphaBeta {
   Future<double> checkSystemMove(
     Board board,
     int depth,
-    int points,
     double alpha,
     double beta,
   ) async {
-    // double bestScore = startScore;
-
     List<Position> emptyTiles = _getEmptyPositions(board);
     if (emptyTiles.isEmpty) {
       return beta;
@@ -107,9 +101,9 @@ class AlphaBeta {
     for (final position in emptyTiles) {
       for (final possibleValue in possibleValues) {
         final newBoard = _tileAdder.addTile(
-            board, position.intX, position.intY, possibleValue);
+            board, position.intX, position.intY, possibleValue,);
         AlphaBetaResult nextResult = await alphaBeta(
-            newBoard, depth - 1, MaximizingPlayer.player, points, alpha, beta);
+            newBoard, depth - 1, MaximizingPlayer.player, alpha, beta,);
         double nextScore = nextResult.score;
 
         if (nextScore < beta) {

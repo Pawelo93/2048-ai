@@ -23,4 +23,36 @@ void main() {
       expect(board.toPositionedTiles(), positionedTiles);
     });
   });
+
+  group('getScore', () {
+
+    test('test 1', () {
+      final board = Board(TwoDimensArray({
+        Position.int(1, 1): MultiTile.single(Tile('1', 2)),
+        Position.int(3, 2): MultiTile.single(Tile('2', 2)),
+      }));
+
+      expect(board.getScore(), 0);
+    });
+
+    test('test 2', () {
+      final board = Board(TwoDimensArray({
+        Position.int(1, 1): MultiTile.single(Tile('1', 8)),
+        Position.int(1, 2): MultiTile.single(Tile('1', 16)),
+      }));
+
+      expect(board.getScore(), 64);
+    });
+
+    test('test 3', () {
+      final board = Board(TwoDimensArray({
+        Position.int(1, 1): MultiTile.single(Tile('1', 2)),
+        Position.int(1, 2): MultiTile.single(Tile('1', 4)),
+        Position.int(1, 3): MultiTile.single(Tile('1', 8)),
+        Position.int(1, 0): MultiTile.single(Tile('1', 16)),
+      }));
+
+      expect(board.getScore(), 68);
+    });
+  });
 }

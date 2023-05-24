@@ -34,7 +34,7 @@ class GeneticBloc extends Cubit<GeneticState> {
 
     final nextIndex = state.index + 1;
     if (nextIndex < state.allWeightsCount) {
-      print('ELEMENT $nextIndex');
+      // print('ELEMENT $nextIndex');
       final fitnessElements = List.of(state.fitnessElements)..add(FitnessElement(currentWeights, gameScore));
       emit(GeneticState(state.weightsList, nextIndex, state.allWeightsCount, fitnessElements));
     } else {
