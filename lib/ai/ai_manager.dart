@@ -3,7 +3,6 @@ import 'dart:isolate';
 import 'package:game_2048/ai/alpha_beta/alpha_beta.dart';
 import 'package:game_2048/ai/genetic/genetic_manager.dart';
 import 'package:game_2048/ai/maximizing_player.dart';
-import 'package:game_2048/ai/mini_max/mini_max.dart';
 import 'package:game_2048/board/board.dart';
 import 'package:game_2048/game/game_bloc.dart';
 
@@ -25,7 +24,7 @@ class AiManager {
       final start = DateTime.now().millisecondsSinceEpoch;
       result = await _alphaBeta.alphaBeta(
         board,
-        3,
+        4,
         MaximizingPlayer.player,
         -double.infinity,
         double.infinity

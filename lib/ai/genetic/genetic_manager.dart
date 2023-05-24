@@ -8,8 +8,8 @@ typedef PlayGameContract = Future<double> Function(ScoreWeights weights);
 
 class GeneticManager {
   int generation = 0;
-  int totalPopulation = 20;
-  double mutationRate = 0.15;
+  int totalPopulation = 100;
+  double mutationRate = 0.1;
 
   final Random random = Random();
   late PlayGameContract playGameContract;
@@ -27,7 +27,7 @@ class GeneticManager {
       startGeneration.add(
         ScoreWeights(
           newPoints: Weight(random.nextDouble()),
-          merging: Weight(random.nextDouble()),
+          valuesGradient: Weight(random.nextDouble()),
           emptyTiles: Weight(random.nextDouble()),
           clustering: Weight(random.nextDouble()),
         ),
@@ -55,7 +55,7 @@ class GeneticManager {
       id,
       Weights(
         w1: best.weights.newPoints.value,
-        w2: best.weights.merging.value,
+        w2: best.weights.valuesGradient.value,
         w3: best.weights.emptyTiles.value,
         w4: best.weights.clustering.value,
         generation: generation,
@@ -74,7 +74,7 @@ class GeneticManager {
 
   void showWeights(ScoreWeights weights) {
     print('== NewPoints: ${weights.newPoints.value.toStringAsFixed(2)} ');
-    print('== Merging: ${weights.merging.value.toStringAsFixed(2)} ');
+    print('== Gradient: ${weights.valuesGradient.value.toStringAsFixed(2)} ');
     print('== EmptyTiles: ${weights.emptyTiles.value.toStringAsFixed(2)} ');
     print('== Clustering: ${weights.clustering.value.toStringAsFixed(2)} ');
   }
@@ -121,7 +121,7 @@ class GeneticManager {
     final rand2 = random.nextBool();
     final newNewPoints =
         rand1 ? first.weights.newPoints : second.weights.newPoints;
-    final newMerging = rand1 ? second.weights.merging : first.weights.merging;
+    final newMerging = rand1 ? second.weights.valuesGradient : first.weights.valuesGradient;
     final newEmptyTiles =
         rand2 ? first.weights.emptyTiles : second.weights.emptyTiles;
     final newClustering =
@@ -129,7 +129,7 @@ class GeneticManager {
 
     ScoreWeights newWeights = ScoreWeights(
       newPoints: newNewPoints,
-      merging: newMerging,
+      valuesGradient: newMerging,
       emptyTiles: newEmptyTiles,
       clustering: newClustering,
     );
@@ -153,8 +153,8 @@ class GeneticManager {
         ? scoreWeights.newPoints.value + mutationW1
         : scoreWeights.newPoints.value - mutationW1;
     double mergingMutated = addOrSubtractMutation2
-        ? scoreWeights.merging.value + mutationW2
-        : scoreWeights.merging.value - mutationW2;
+        ? scoreWeights.valuesGradient.value + mutationW2
+        : scoreWeights.valuesGradient.value - mutationW2;
     double emptyTilesMutated = addOrSubtractMutation2
         ? scoreWeights.emptyTiles.value + mutationW3
         : scoreWeights.emptyTiles.value - mutationW3;
@@ -164,7 +164,7 @@ class GeneticManager {
 
     final afterMutation = ScoreWeights(
       newPoints: Weight(normalized(newPointsMutated)),
-      merging: Weight(normalized(mergingMutated)),
+      valuesGradient: Weight(normalized(mergingMutated)),
       emptyTiles: Weight(normalized(emptyTilesMutated)),
       clustering: Weight(normalized(clusteringMutated)),
     );
@@ -215,19 +215,19 @@ class GeneticManager {
 
 class ScoreWeights extends Equatable {
   final Weight newPoints;
-  final Weight merging;
+  final Weight valuesGradient;
   final Weight emptyTiles;
   final Weight clustering;
 
   const ScoreWeights({
     required this.newPoints,
-    required this.merging,
+    required this.valuesGradient,
     required this.emptyTiles,
     required this.clustering,
   });
 
   @override
-  List<Object?> get props => [newPoints, merging, emptyTiles, clustering];
+  List<Object?> get props => [newPoints, valuesGradient, emptyTiles, clustering];
 }
 
 class Weight extends Equatable {

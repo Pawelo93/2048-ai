@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:game_2048/ai/genetic/genetic_manager.dart';
 import 'package:game_2048/board/board.dart';
+import 'package:game_2048/board/tile/tile.dart';
 
 class ScoreCalculator {
   late ScoreWeights weights;
@@ -11,14 +12,38 @@ class ScoreCalculator {
 
   double calculate(ScoreCalculatorModel model) {
     final double points = model.board.getScore() / 15000;
-    final emptyTiles = 16 - model.board.array.items.values.length;
-    final int notMerged = model.board.array.items.values
-        .where((element) => !element.isSingle)
-        .length;
+    final emptyTiles = (16 - model.board.array.items.values.length) / 16;
+    // final int notMerged = model.board.array.items.values
+    //     .where((element) => !element.isSingle)
+    //     .length;
+    final allValues = List.of(model.board.array.items.values.where((element) => element.firstOrNull != null).map((e) => e.firstOrNull!).map((e) => e.value));
+    allValues.sort((a, b) => b.compareTo(a));
+    final highestValue = allValues.first;
+    final hv2 = allValues[1];
+    int? hv3 = null;
+    try {
+      hv3 = allValues[2];
+    } catch(e) {}
+    double gradientSum = 0;
+    gradientSum += model.board.array.get(3, 3)?.firstOrNull?.value == highestValue ? 0.5 : 0;
+    gradientSum += model.board.array.get(3, 2)?.firstOrNull?.value == hv2 ? 0.3 : 0;
+    if (hv3 != null) {
+      gradientSum += model.board.array
+          .get(3, 1)
+          ?.firstOrNull
+          ?.value == hv3 ? 0.2 : 0;
+    }
+
     final clustering = calculateClustering(model.board);
 
-    return points * weights.newPoints.value -
-        notMerged * weights.merging.value +
+    // print('\n'
+    //     'points ${points * weights.newPoints.value} \n'
+    //     'gradient ${gradientSum * weights.valuesGradient.value} \n'
+    //     'emptyTiles ${emptyTiles * weights.emptyTiles.value} \n'
+    //     'clustering ${clustering * weights.clustering.value} \n');
+
+    return points * weights.newPoints.value +
+        gradientSum * weights.valuesGradient.value +
         emptyTiles * weights.emptyTiles.value +
         clustering * weights.clustering.value;
   }

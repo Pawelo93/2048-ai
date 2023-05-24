@@ -148,7 +148,7 @@ class GameView extends StatelessWidget {
         currentState.board,
         const ScoreWeights(
           newPoints: Weight(0.18),
-          merging: Weight(0.47),
+          valuesGradient: Weight(0.47),
           emptyTiles: Weight(0.30),
           clustering: Weight(0.19),
         ),
