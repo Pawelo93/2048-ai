@@ -1,0 +1,4 @@
+enum MaximizingPlayer {
+  system,
+  player,
+}

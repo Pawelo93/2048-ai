@@ -9,8 +9,7 @@ import 'package:game_2048/board/tile/tile_adder.dart';
 import 'package:game_2048/board/util/position.dart';
 import 'package:game_2048/game/game_bloc.dart';
 
-
-class MiniMax {
+class AlphaBeta {
   final TileAdder _tileAdder = TileAdder();
   final BoardMover _boardMover = BoardMover();
   final BoardTileMerger _boardTileMerger = BoardTileMerger();
@@ -20,38 +19,44 @@ class MiniMax {
     _scoreCalculator.setupWeights(weights);
   }
 
-  Future<MiniMaxResult> minimax(
+  Future<AlphaBetaResult> alphaBeta(
     Board board,
     int depth,
     MaximizingPlayer maximizingPlayer,
     int points,
+    double alpha,
+    double beta,
   ) async {
     MoveDirection? bestDirection;
     double bestScore = 0;
 
     if (depth == 0) {
       final score = _scoreCalculator.calculate(board, points);
-      return MiniMaxResult(score, bestDirection);
+      return AlphaBetaResult(score, bestDirection);
     }
 
     if (maximizingPlayer == MaximizingPlayer.player) {
-      final moveResult = await checkPlayerMoves(board, depth, -double.infinity);
+      final moveResult = await checkPlayerMoves(board, depth, alpha, beta);
       bestDirection = moveResult.direction;
       bestScore = moveResult.score;
     } else {
-      bestScore = await checkSystemMove(board, depth, double.infinity, points);
+      bestScore = await checkSystemMove(board, depth, points, alpha, beta);
     }
 
-    return MiniMaxResult(bestScore, bestDirection);
+    return AlphaBetaResult(bestScore, bestDirection);
   }
 
-  Future<PlayerMoveResult> checkPlayerMoves(Board board, int depth, double startScore) async {
+  Future<PlayerMoveResult> checkPlayerMoves(
+    Board board,
+    int depth,
+    double alpha,
+    double beta,
+  ) async {
     MoveDirection? bestDirection;
-    double bestScore = startScore;
 
     if (isGameTerminated(board)) {
-      bestScore = 0;
-      return PlayerMoveResult(bestScore, bestDirection);
+      alpha = 0;
+      return PlayerMoveResult(alpha, bestDirection);
     }
 
     for (final direction in MoveDirection.values) {
@@ -61,16 +66,63 @@ class MiniMax {
 
       final movedBoard = _boardMover.move(board, direction);
       final mergedBoard = _boardTileMerger.merge(movedBoard);
-      MiniMaxResult nextResult = await minimax(mergedBoard.board, depth - 1, MaximizingPlayer.system, mergedBoard.points);
+      AlphaBetaResult nextResult = await alphaBeta(
+        mergedBoard.board,
+        depth - 1,
+        MaximizingPlayer.system,
+        mergedBoard.points,
+        alpha,
+        beta,
+      );
       double nextScore = nextResult.score;
 
-      if (nextScore > bestScore) {
-        bestScore = nextScore;
+      if (nextScore > alpha) {
+        alpha = nextScore;
         bestDirection = direction;
+      }
+      if (beta <= alpha) {
+        break;
       }
     }
 
-    return PlayerMoveResult(bestScore, bestDirection);
+    return PlayerMoveResult(alpha, bestDirection);
+  }
+
+  Future<double> checkSystemMove(
+    Board board,
+    int depth,
+    int points,
+    double alpha,
+    double beta,
+  ) async {
+    // double bestScore = startScore;
+
+    List<Position> emptyTiles = _getEmptyPositions(board);
+    if (emptyTiles.isEmpty) {
+      return beta;
+    }
+
+    List<int> possibleValues = [2, 4];
+
+    for (final position in emptyTiles) {
+      for (final possibleValue in possibleValues) {
+        final newBoard = _tileAdder.addTile(
+            board, position.intX, position.intY, possibleValue);
+        AlphaBetaResult nextResult = await alphaBeta(
+            newBoard, depth - 1, MaximizingPlayer.player, points, alpha, beta);
+        double nextScore = nextResult.score;
+
+        if (nextScore < beta) {
+          beta = nextScore;
+        }
+
+        if (beta <= alpha) {
+          return beta;
+        }
+      }
+    }
+
+    return beta;
   }
 
   bool isGameTerminated(Board board) {
@@ -81,34 +133,6 @@ class MiniMax {
       }
     }
     return true;
-  }
-
-  Future<double> checkSystemMove(
-      Board board, int depth, double startScore, int points,) async {
-    double bestScore = startScore;
-
-    List<Position> emptyTiles = _getEmptyPositions(board);
-    if (emptyTiles.isEmpty) {
-      return bestScore;
-    }
-
-    List<int> possibleValues = [2, 4];
-
-    for (final position in emptyTiles) {
-      for (final possibleValue in possibleValues) {
-        final newBoard = _tileAdder.addTile(
-            board, position.intX, position.intY, possibleValue);
-        MiniMaxResult nextResult =
-            await minimax(newBoard, depth - 1, MaximizingPlayer.player, points);
-        double nextScore = nextResult.score;
-
-        if (nextScore < bestScore) {
-          bestScore = nextScore;
-        }
-      }
-    }
-
-    return bestScore;
   }
 
   List<Position> _getEmptyPositions(Board board) {
@@ -124,11 +148,11 @@ class MiniMax {
   }
 }
 
-class MiniMaxResult extends Equatable {
+class AlphaBetaResult extends Equatable {
   final double score;
   final MoveDirection? direction;
 
-  const MiniMaxResult(this.score, this.direction);
+  const AlphaBetaResult(this.score, this.direction);
 
   @override
   List<Object?> get props => [score, direction];
